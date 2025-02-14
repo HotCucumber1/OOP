@@ -26,7 +26,6 @@ void CopyStreamWithReplacement(std::istream& input, std::ostream& output,
 void ExitWithMessage(int exitCode = 1, const std::string& message = "ERROR");
 void AssertHelpFlag(const std::string& flag);
 void AssertFileIsOpen(std::ifstream& file);
-void AssertStringEnter(const std::string& string);
 void PrintHelp();
 
 
@@ -78,7 +77,11 @@ InputParams GetInputParamsFromStdin(std::istream& input)
 
     InputState inputState = searchString;
     std::string line;
-    while (std::getline(input, line))
+    if (!std::getline(input, line))
+    {
+        ExitWithMessage(0);
+    }
+    do
     {
         switch (inputState)
         {
@@ -90,9 +93,9 @@ InputParams GetInputParamsFromStdin(std::istream& input)
                 inputParams.replacementString = line;
                 return inputParams;
         }
-    }
-    AssertStringEnter(inputParams.searchString);
-    AssertStringEnter(inputParams.replacementString);
+    } while (std::getline(input, line));
+
+    ExitWithMessage(0);
     return inputParams;
 }
 
@@ -112,7 +115,7 @@ void CopyFileWithReplacement(std::string& input, std::string& output,
 {
     if (input == "cin" && output == "cout")
     {
-        CopyStreamWithReplacement(std::cin,std::cout, searchString, replacementString);
+        CopyStreamWithReplacement(std::cin, std::cout, searchString, replacementString);
         return;
     }
     std::ifstream inputFile(input);
@@ -128,11 +131,15 @@ void CopyStreamWithReplacement(std::istream& input, std::ostream& output,
                                const std::string& searchString, const std::string& replacementString)
 {
     std::string line;
-    while (std::getline(input, line))
+
+    if (!std::getline(input, line))
     {
-        AssertStringEnter(line);
-        output << ReplaceString(line, searchString, replacementString) << std::endl;
+        ExitWithMessage(0);
     }
+    do
+    {
+        output << ReplaceString(line, searchString, replacementString) << std::endl;
+    } while (std::getline(input, line));
 }
 
 std::string ReplaceString(const std::string& subject,
@@ -174,14 +181,6 @@ void AssertFileIsOpen(std::ifstream& file)
     if (file.fail())
     {
         ExitWithMessage();
-    }
-}
-
-void AssertStringEnter(const std::string& string)
-{
-    if (string.empty())
-    {
-        ExitWithMessage(0);
     }
 }
 

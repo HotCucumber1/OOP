@@ -10,7 +10,7 @@ print_error() {
 assertFilesEqual() {
     if ! cmp -s "$1" "$2"
     then
-        print_error "Program testing failed: $1 and $2 are not equal"
+        print_error "Program testing failed: <$1> and <$2> are not equal"
     fi
 }
 
@@ -82,7 +82,7 @@ if [ $? -ne 0 ]
 then
     print_error "Program testing failed: Program failed with empty replace"
 else
-    assertFilesEqual output/test-empty-replace data/right_output/error-out
+    assertFilesEqual output/test-empty-replace data/right_output/empty-replace-out
 fi
 
 "$PROGRAM" < data/test-empty-subject > output/test-empty-subject
