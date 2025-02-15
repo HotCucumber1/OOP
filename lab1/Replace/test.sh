@@ -49,7 +49,7 @@ then
     print_error "Program testing failed: Program failed with valid help flag"
 fi
 
-"$PROGRAM" data/input1 output/output1.txt ma mama > /dev/null
+"$PROGRAM" data/not-existed-file output/output1.txt ma mama > /dev/null
 if [ $? -eq 0 ]
 then
     print_error "Program testing failed: Program failed with invalid file"

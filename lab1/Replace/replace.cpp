@@ -33,10 +33,8 @@ int main(int argc, char* argv[])
 {
     auto inputParams = ParseArgs(argc, argv);
 
-    CopyFileWithReplacement(inputParams.input,
-                            inputParams.output,
-                            inputParams.searchString,
-                            inputParams.replacementString);
+    CopyFileWithReplacement(inputParams.input, inputParams.output,
+                            inputParams.searchString, inputParams.replacementString);
     return 0;
 }
 
@@ -46,17 +44,17 @@ InputParams ParseArgs(int argc, char* argv[])
     const int helpArgumentsCount = 2;
     const int cliArgumentsCount = 5;
 
-    if (argc == stdinArgumentsCount)
+	if (argc == stdinArgumentsCount)
     {
         return GetInputParamsFromStdin(std::cin);
     }
-    else if (argc == helpArgumentsCount)
+	else if (argc == helpArgumentsCount)
     {
         AssertHelpFlag(argv[1]);
         PrintHelp();
         ExitWithMessage(0, "");
     }
-    else if (argc != cliArgumentsCount)
+	else if (argc != cliArgumentsCount)
     {
         ExitWithMessage();
     }
@@ -65,7 +63,7 @@ InputParams ParseArgs(int argc, char* argv[])
 
 InputParams GetInputParamsFromStdin(std::istream& input)
 {
-    enum InputState
+    enum InputState // enum classe are better
     {
         searchString,
         replacementString,
@@ -82,7 +80,7 @@ InputParams GetInputParamsFromStdin(std::istream& input)
         ExitWithMessage(0);
     }
     do
-    {
+    { // просто считать 2 строки
         switch (inputState)
         {
             case searchString:
@@ -113,14 +111,14 @@ InputParams GetInputParamsFromArgv(char* argv[])
 void CopyFileWithReplacement(std::string& input, std::string& output,
                              const std::string& searchString, const std::string& replacementString)
 {
-    if (input == "cin" && output == "cout")
+    if (input == "cin" && output == "cout") // заменить как-то
     {
         CopyStreamWithReplacement(std::cin, std::cout, searchString, replacementString);
         return;
     }
     std::ifstream inputFile(input);
-    AssertFileIsOpen(inputFile);
     std::ofstream outputFile(output);
+	AssertFileIsOpen(inputFile);
 
     CopyStreamWithReplacement(inputFile,outputFile,
                               searchString, replacementString);
@@ -131,7 +129,6 @@ void CopyStreamWithReplacement(std::istream& input, std::ostream& output,
                                const std::string& searchString, const std::string& replacementString)
 {
     std::string line;
-
     if (!std::getline(input, line))
     {
         ExitWithMessage(0);
@@ -187,7 +184,7 @@ void AssertFileIsOpen(std::ifstream& file)
 void ExitWithMessage(int exitCode, const std::string& message)
 {
     std::cout << message << std::endl;
-    exit(exitCode);
+    exit(exitCode); // exceptions
 }
 
 void PrintHelp()
