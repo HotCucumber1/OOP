@@ -2,14 +2,15 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <stdexcept>
 
 
 struct InputParams
 {
     std::string searchString;
     std::string replacementString;
-    std::string input;
-    std::string output;
+    std::istream& input;
+    std::ostream& output;
 };
 
 
@@ -19,22 +20,32 @@ InputParams GetInputParamsFromArgv(char* argv[]);
 std::string ReplaceString(const std::string& subject,
                           const std::string& searchString,
                           const std::string& replacementString);
-void CopyFileWithReplacement(std::string& input, std::string& output,
-                             const std::string& searchString, const std::string& replacementString);
 void CopyStreamWithReplacement(std::istream& input, std::ostream& output,
                                const std::string& searchString, const std::string& replacementString);
-void ExitWithMessage(int exitCode = 1, const std::string& message = "ERROR");
 void AssertHelpFlag(const std::string& flag);
 void AssertFileIsOpen(std::ifstream& file);
 void PrintHelp();
 
 
+// TODO: exceptions
 int main(int argc, char* argv[])
 {
-    auto inputParams = ParseArgs(argc, argv);
+//	try
+//	{
+//		auto inputParams = ParseArgs(argc, argv);
+//
+//		CopyStreamWithReplacement(inputParams.input, inputParams.output,
+//									inputParams.searchString, inputParams.replacementString);
+//	}
+//	catch (const std::exception& exception)
+//	{
+//		std::cout << exception.what() << std::endl;
+//		return 1;
+//	}
+	auto inputParams = ParseArgs(argc, argv);
 
-    CopyFileWithReplacement(inputParams.input, inputParams.output,
-                            inputParams.searchString, inputParams.replacementString);
+	CopyStreamWithReplacement(inputParams.input, inputParams.output,
+								inputParams.searchString, inputParams.replacementString);
     return 0;
 }
 
@@ -52,87 +63,66 @@ InputParams ParseArgs(int argc, char* argv[])
     {
         AssertHelpFlag(argv[1]);
         PrintHelp();
-        ExitWithMessage(0, "");
+		throw std::exception();
     }
 	else if (argc != cliArgumentsCount)
     {
-        ExitWithMessage();
+		throw std::invalid_argument("ERROR");
     }
     return GetInputParamsFromArgv(argv);
 }
 
 InputParams GetInputParamsFromStdin(std::istream& input)
 {
-    enum InputState // enum classe are better
+	// TODO: избавиться от enum и цикла
+    std::string searchString;
+	std::string replacementString;
+    if (!std::getline(input, searchString) ||
+		!std::getline(input, replacementString))
     {
-        searchString,
-        replacementString,
-    };
-
-    InputParams inputParams;
-    inputParams.input = "cin";
-    inputParams.output = "cout";
-
-    InputState inputState = searchString;
-    std::string line;
-    if (!std::getline(input, line))
-    {
-        ExitWithMessage(0);
+		throw std::runtime_error("ERROR");
     }
-    do
-    { // просто считать 2 строки
-        switch (inputState)
-        {
-            case searchString:
-                inputParams.searchString = line;
-                inputState = replacementString;
-                break;
-            case replacementString:
-                inputParams.replacementString = line;
-                return inputParams;
-        }
-    } while (std::getline(input, line));
 
-    ExitWithMessage(0);
-    return inputParams;
+    return {
+		searchString,
+		replacementString,
+		std::cin,
+		std::cout
+	};
 }
 
 InputParams GetInputParamsFromArgv(char* argv[])
 {
-    InputParams inputParams;
-
-    inputParams.input = argv[1];
-    inputParams.output = argv[2];
-    inputParams.searchString = argv[3];
-    inputParams.replacementString = argv[4];
-    return inputParams;
-}
-
-void CopyFileWithReplacement(std::string& input, std::string& output,
-                             const std::string& searchString, const std::string& replacementString)
-{
-    if (input == "cin" && output == "cout") // заменить как-то
-    {
-        CopyStreamWithReplacement(std::cin, std::cout, searchString, replacementString);
-        return;
-    }
-    std::ifstream inputFile(input);
-    std::ofstream outputFile(output);
+	std::ifstream inputFile(argv[1]);
+	std::ofstream outputFile( argv[2]);
 	AssertFileIsOpen(inputFile);
 
-    CopyStreamWithReplacement(inputFile,outputFile,
-                              searchString, replacementString);
-    outputFile.flush();
+	std::string searchString = argv[3];
+	std::string replacementString = argv[4];
+
+    return {
+		searchString,
+		replacementString,
+		inputFile,
+		outputFile
+	};
 }
 
 void CopyStreamWithReplacement(std::istream& input, std::ostream& output,
                                const std::string& searchString, const std::string& replacementString)
 {
+	// TODO: избавиться от "cin" и "cout"
     std::string line;
+	if (!input.fail())
+	{
+		std::cout << "Hey hey" << std::endl;
+	}
+	//////////////////////////////////////////////
     if (!std::getline(input, line))
     {
-        ExitWithMessage(0);
+        throw std::runtime_error("ERROR");
     }
+	//////////////////////////////////////////////
     do
     {
         output << ReplaceString(line, searchString, replacementString) << std::endl;
@@ -169,7 +159,7 @@ void AssertHelpFlag(const std::string& flag)
     const std::string helpFlag = "-h";
     if (flag != helpFlag)
     {
-        ExitWithMessage();
+		throw std::invalid_argument("ERROR");
     }
 }
 
@@ -177,14 +167,8 @@ void AssertFileIsOpen(std::ifstream& file)
 {
     if (file.fail())
     {
-        ExitWithMessage();
+		throw std::ios_base::failure("ERROR");
     }
-}
-
-void ExitWithMessage(int exitCode, const std::string& message)
-{
-    std::cout << message << std::endl;
-    exit(exitCode); // exceptions
 }
 
 void PrintHelp()
