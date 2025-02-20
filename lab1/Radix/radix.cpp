@@ -15,11 +15,12 @@ struct InputParams
 const std::string validDigits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 InputParams ParseArgs(int argc, char* argv[]);
-InputParams GetInputParams(char* argv[]);
 std::string GetNotation(int value, int radix);
-std::string IntToString(int n, int radix, bool& wasError);
-int StringToInt(const std::string& str, int radix, bool& wasError);
-bool CheckOverflow(int value, int addition);
+std::string IntToString(int n, int radix);
+int GetRadix(const std::string& radixStr);
+int StringToInt(const std::string& str, int radix);
+bool IsOverflow(int value, int addition);
+bool isCharInString(const std::string& str, char ch);
 void AssertArgCount(int argc);
 void AssertRadix(int radix);
 
@@ -43,27 +44,12 @@ int main(int argc, char* argv[])
 InputParams ParseArgs(int argc, char* argv[])
 {
     AssertArgCount(argc);
-    return GetInputParams(argv);
-}
 
-InputParams GetInputParams(char* argv[])
-{
-	const int inputRadix = 10;
-	bool wasError = false;
+	int sourceRadix = GetRadix(argv[1]);
+	int destinationRadix = GetRadix(argv[2]);
+	int value = StringToInt(argv[3], sourceRadix);
 
-    int sourceRadix = StringToInt(argv[1], inputRadix, wasError);
-	AssertRadix(sourceRadix);
-
-	int destinationRadix = StringToInt(argv[2], inputRadix, wasError);
-	AssertRadix(destinationRadix);
-
-	int value = StringToInt(argv[3], sourceRadix, wasError);
-    if (wasError)
-	{
-		throw std::invalid_argument("Wrong notation argument");
-	}
-
-    return {
+	return {
 		destinationRadix,
 		value
 	};
@@ -71,58 +57,58 @@ InputParams GetInputParams(char* argv[])
 
 std::string GetNotation(int value, int radix)
 {
-	bool wasError = false;
-
-	std::string outputNotation = IntToString(value, radix, wasError);
-	if (wasError)
-	{
-		throw std::runtime_error("Wrong number");
-	}
-	return outputNotation;
+	return IntToString(value, radix);
 }
 
-
-int StringToInt(const std::string& str, int radix, bool& wasError)
+int GetRadix(const std::string& radixStr)
 {
-	const int startPos = 0;
-	const std::string allowedDigits = validDigits.substr(startPos, radix);
+	const int inputRadix = 10;
+
+	int radix = StringToInt(radixStr, inputRadix);
+	AssertRadix(radix);
+
+	return radix;
+}
+
+int StringToInt(const std::string& str, int radix)
+{
+	const std::string allowedDigits = validDigits.substr(0, radix);
 
 	int value = 0;
 	for (size_t i = 0; i < str.length(); i++)
 	{
 		char digit = str[str.length() - i - 1];
-		if (allowedDigits.find(digit) == std::string::npos)
+		if (digit == '-')
 		{
-			wasError = true;
+			value *= (-1);
+			continue;
+		}
+		if (!isCharInString(allowedDigits, digit))
+		{
+			throw std::invalid_argument("Wrong notation argument");
 		}
 		int addition = allowedDigits.find(digit) * std::pow(radix, i);
-		if (!CheckOverflow(value, addition))
+		if (IsOverflow(value, addition))
 		{
-			wasError = true;
-		}
-		if (wasError)
-		{
-			return value;
+			throw std::invalid_argument("Overflow");
 		}
 		value += addition;
 	}
     return value;
 }
 
-std::string IntToString(int n, int radix, bool& wasError)
+std::string IntToString(int n, int radix)
 {
-	const int startPos = 0;
-	const std::string allowedDigits = validDigits.substr(startPos, radix);
-
 	std::string value;
-	int wholeNumber = n;
+	int wholeNumber = std::abs(n);
     while (wholeNumber >= radix)
 	{
 		int remainder = wholeNumber % radix;
-		value += allowedDigits[remainder];
+		value += validDigits[remainder];
 		wholeNumber /= radix;
 	}
-	value += allowedDigits[wholeNumber];
+	value += validDigits[wholeNumber];
+	value += (n < 0) ? "-" : "";
 	std::reverse(value.begin(), value.end());
 	return value;
 }
@@ -143,19 +129,16 @@ void AssertRadix(int radix)
 
 	if (radix < minRadix || radix > maxRadix)
 	{
-		throw std::invalid_argument("Wrong notation number");
+		throw std::invalid_argument("Wrong notation radix");
 	}
 }
 
-bool CheckOverflow(int value, int addition)
+bool IsOverflow(int value, int addition)
 {
-	if (value > 0 && addition > 0)
-	{
-		return value <= std::numeric_limits<int>::max() - addition;
-	}
-	if (value < 0 && addition < 0)
-	{
-		return value >= std::numeric_limits<int>::min() + addition;
-	}
-	return true;
+	return value > std::numeric_limits<int>::max() - addition;
+}
+
+bool isCharInString(const std::string& str, char ch)
+{
+	return str.find(ch) != std::string::npos;
 }
