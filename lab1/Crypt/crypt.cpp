@@ -3,6 +3,7 @@
 #include <string>
 #include <limits>
 #include <cmath>
+#include <memory>
 
 
 enum class ActionType
@@ -14,20 +15,19 @@ enum class ActionType
 struct InputParams
 {
 	ActionType action;
-	std::ifstream& inputFile;
-	std::ofstream& outputFile;
+	std::shared_ptr<std::istream> inputFile;
+	std::shared_ptr<std::ostream> outputFile;
 	unsigned char key;
 };
 
 InputParams ParseArgs(int argc, char* argv[]);
 ActionType GetActionType(std::string actionStr);
 unsigned char GetKey(std::string keyStr);
-void Crypt(std::ifstream& input, std::ofstream& output, unsigned char key);
-void Decrypt(std::ifstream& input, std::ofstream& output, unsigned char key);
+void Crypt(std::istream& input, std::ostream& output, unsigned char key);
+void Decrypt(std::istream& input, std::ostream& output, unsigned char key);
 int StringToInt(const std::string& str, int radix);
 int CharToInt(char ch, int radix);
 bool IsOverflow(int value, int addition);
-
 void AssertArgumentNumber(int argc);
 void AssertFileIsOpen(const std::istream& file);
 
@@ -39,10 +39,10 @@ int main(int argc, char* argv[])
 		switch (inputParams.action)
 		{
 		case ActionType::Crypt:
-			Crypt(inputParams.inputFile, inputParams.outputFile, inputParams.key);
+			Crypt(*inputParams.inputFile, *inputParams.outputFile, inputParams.key);
 			break;
 		case ActionType::Decrypt:
-			Decrypt(inputParams.inputFile, inputParams.outputFile, inputParams.key);
+			Decrypt(*inputParams.inputFile, *inputParams.outputFile, inputParams.key);
 			break;
 		}
 	}
@@ -59,9 +59,9 @@ InputParams ParseArgs(int argc, char* argv[])
 	AssertArgumentNumber(argc);
 	ActionType action = GetActionType(argv[1]);
 
-	std::ifstream inputFile(argv[2]);
-	AssertFileIsOpen(inputFile);
-	std::ofstream outputFile(argv[3]);
+	auto inputFile= std::make_shared<std::ifstream>(argv[2]);
+	AssertFileIsOpen(*inputFile);
+	auto outputFile= std::make_shared<std::ofstream>(argv[3]);
 
 	unsigned char key = GetKey(argv[4]);
 	return {
@@ -72,7 +72,7 @@ InputParams ParseArgs(int argc, char* argv[])
 	};
 }
 
-void Crypt(std::ifstream& input, std::ofstream& output, unsigned char key)
+void Crypt(std::istream& input, std::ostream& output, unsigned char key)
 {
 	char byte;
 	while (input.get(byte))
@@ -93,7 +93,7 @@ void Crypt(std::ifstream& input, std::ofstream& output, unsigned char key)
 	}
 }
 
-void Decrypt(std::ifstream& input, std::ofstream& output, unsigned char key)
+void Decrypt(std::istream& input, std::ostream& output, unsigned char key)
 {
 	char byte;
 	while (input.get(byte))
@@ -181,7 +181,7 @@ int CharToInt(char ch, int radix)
 		: ch - 'A' + decimal;
 	if (number >= radix)
 	{
-		throw std::runtime_error("Invalid radix");
+		throw std::runtime_error("Invalid number");
 	}
 	return number;
 }
