@@ -12,15 +12,13 @@ struct InputParams
     int value;
 };
 
-const std::string validDigits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
 InputParams ParseArgs(int argc, char* argv[]);
-std::string GetNotation(int value, int radix);
 std::string IntToString(int n, int radix);
 int GetRadix(const std::string& radixStr);
 int StringToInt(const std::string& str, int radix);
+char IntToChar(int number);
+int CharToInt(char ch, int radix);
 bool IsOverflow(int value, int addition);
-bool isCharInString(const std::string& str, char ch);
 void AssertArgCount(int argc);
 void AssertRadix(int radix);
 
@@ -29,9 +27,9 @@ int main(int argc, char* argv[])
 	try
 	{
 		InputParams inputParams = ParseArgs(argc, argv);
-		std::string requiredNotation = GetNotation(inputParams.value,
+		std::string resultNumber = IntToString(inputParams.value,
 												inputParams.destinationRadix);
-		std::cout << requiredNotation << std::endl;
+		std::cout << resultNumber << std::endl;
 	}
 	catch (const std::exception& exception)
 	{
@@ -55,11 +53,6 @@ InputParams ParseArgs(int argc, char* argv[])
 	};
 }
 
-std::string GetNotation(int value, int radix)
-{
-	return IntToString(value, radix);
-}
-
 int GetRadix(const std::string& radixStr)
 {
 	const int inputRadix = 10;
@@ -72,8 +65,6 @@ int GetRadix(const std::string& radixStr)
 
 int StringToInt(const std::string& str, int radix)
 {
-	const std::string allowedDigits = validDigits.substr(0, radix);
-
 	int value = 0;
 	for (size_t i = 0; i < str.length(); i++)
 	{
@@ -83,11 +74,7 @@ int StringToInt(const std::string& str, int radix)
 			value *= (-1);
 			continue;
 		}
-		if (!isCharInString(allowedDigits, digit))
-		{
-			throw std::invalid_argument("Wrong notation argument");
-		}
-		int addition = allowedDigits.find(digit) * std::pow(radix, i);
+		int addition = CharToInt(digit, radix) * std::pow(radix, i);
 		if (IsOverflow(value, addition))
 		{
 			throw std::invalid_argument("Overflow");
@@ -100,17 +87,48 @@ int StringToInt(const std::string& str, int radix)
 std::string IntToString(int n, int radix)
 {
 	std::string value;
-	int wholeNumber = std::abs(n);
-    while (wholeNumber >= radix)
+	int positiveNumber = std::abs(n);
+    while (positiveNumber >= radix)
 	{
-		int remainder = wholeNumber % radix;
-		value += validDigits[remainder];
-		wholeNumber /= radix;
+		int remainder = positiveNumber % radix;
+		value += IntToChar(remainder);
+		positiveNumber /= radix;
 	}
-	value += validDigits[wholeNumber];
+	value += IntToChar(positiveNumber);
 	value += (n < 0) ? "-" : "";
 	std::reverse(value.begin(), value.end());
 	return value;
+}
+
+// TODO: IntToChar
+char IntToChar(int number)
+{
+	const int decimal = 10;
+
+	return number < decimal
+		? ('0' + number)
+		: ('A' + (number - decimal));
+}
+
+// TODO: IntToChar(char ch, int redux)
+int CharToInt(char ch, int radix)
+{
+	const int decimal = 10;
+	bool isDigit = ch >= '0' and ch <= '9';
+	bool isLetter = ch >= 'A' and ch <= 'Z';
+
+	if (!isDigit && !isLetter)
+	{
+		throw std::runtime_error("Invalid digit");
+	}
+	int number = (isDigit)
+		? ch - '0'
+		: ch - 'A' + decimal;
+	if (number >= radix)
+	{
+		throw std::runtime_error("Invalid radix");
+	}
+	return number;
 }
 
 void AssertArgCount(int argc)
@@ -136,9 +154,4 @@ void AssertRadix(int radix)
 bool IsOverflow(int value, int addition)
 {
 	return value > std::numeric_limits<int>::max() - addition;
-}
-
-bool isCharInString(const std::string& str, char ch)
-{
-	return str.find(ch) != std::string::npos;
 }

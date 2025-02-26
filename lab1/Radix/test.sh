@@ -178,6 +178,12 @@ then
     print_error "Program testing failed: Program failed with overflow"
 fi
 
+answer=$("$PROGRAM" $INVALID_LETTER_DIGIT $HEX_RADIX $VALID_POS_DEC_TO_HEC)
+if [ $? -eq 0 ]
+then
+    print_error "Program testing failed: Program failed with wrong radix"
+fi
+
+
 echo "OK"
-echo""
 exit 0

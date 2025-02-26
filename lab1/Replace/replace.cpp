@@ -30,23 +30,18 @@ void PrintHelp();
 // TODO: exceptions
 int main(int argc, char* argv[])
 {
-//	try
-//	{
-//		auto inputParams = ParseArgs(argc, argv);
-//
-//		CopyStreamWithReplacement(inputParams.input, inputParams.output,
-//									inputParams.searchString, inputParams.replacementString);
-//	}
-//	catch (const std::exception& exception)
-//	{
-//		std::cout << exception.what() << std::endl;
-//		return 1;
-//	}
-	auto inputParams = ParseArgs(argc, argv);
+	try
+	{
+		auto inputParams = ParseArgs(argc, argv);
 
-	CopyStreamWithReplacement(inputParams.input, inputParams.output,
-								inputParams.searchString, inputParams.replacementString);
-    return 0;
+		CopyStreamWithReplacement(inputParams.input, inputParams.output,
+									inputParams.searchString, inputParams.replacementString);
+	}
+	catch (const std::exception& exception)
+	{
+		std::cout << exception.what() << std::endl;
+		return 1;
+	}
 }
 
 InputParams ParseArgs(int argc, char* argv[])
@@ -77,6 +72,7 @@ InputParams GetInputParamsFromStdin(std::istream& input)
 	// TODO: избавиться от enum и цикла
     std::string searchString;
 	std::string replacementString;
+
     if (!std::getline(input, searchString) ||
 		!std::getline(input, replacementString))
     {
@@ -113,16 +109,10 @@ void CopyStreamWithReplacement(std::istream& input, std::ostream& output,
 {
 	// TODO: избавиться от "cin" и "cout"
     std::string line;
-	if (!input.fail())
-	{
-		std::cout << "Hey hey" << std::endl;
-	}
-	//////////////////////////////////////////////
     if (!std::getline(input, line))
     {
         throw std::runtime_error("ERROR");
     }
-	//////////////////////////////////////////////
     do
     {
         output << ReplaceString(line, searchString, replacementString) << std::endl;
