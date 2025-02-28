@@ -27,7 +27,6 @@ void AssertFileIsOpen(std::ifstream& file);
 void PrintHelp();
 
 
-// TODO: exceptions
 int main(int argc, char* argv[])
 {
 	try
@@ -69,7 +68,6 @@ InputParams ParseArgs(int argc, char* argv[])
 
 InputParams GetInputParamsFromStdin(std::istream& input)
 {
-	// TODO: избавиться от enum и цикла
     std::string searchString;
 	std::string replacementString;
 
@@ -107,7 +105,6 @@ InputParams GetInputParamsFromArgv(char* argv[])
 void CopyStreamWithReplacement(std::istream& input, std::ostream& output,
                                const std::string& searchString, const std::string& replacementString)
 {
-	// TODO: избавиться от "cin" и "cout"
     std::string line;
     if (!std::getline(input, line))
     {

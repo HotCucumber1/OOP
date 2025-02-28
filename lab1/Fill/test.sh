@@ -82,6 +82,13 @@ else
     assertFilesEqual output/correct/unlimit-and-outside output/tests/unlimit-and-outside
 fi
 
+"$PROGRAM" tests/near-start-points output/tests/near-start-points
+if [ $? -ne 0 ]
+then
+    print_error "Program testing failed: Program failed with near start points"
+else
+    assertFilesEqual output/correct/near-start-points output/tests/near-start-points
+fi
 
-echo "OK"
+echo "Test: OK"
 exit 0

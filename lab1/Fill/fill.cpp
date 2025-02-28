@@ -6,8 +6,9 @@
 #include <string>
 
 
-const int fieldSize = 100;
-using Field = std::array<std::array<char, fieldSize>, fieldSize>;
+const int FIELD_SIZE = 100;
+const int NEIGHBOURS_COUNT = 4;
+using Field = std::array<std::array<char, FIELD_SIZE>, FIELD_SIZE>;
 
 struct IOParams
 {
@@ -21,12 +22,14 @@ struct Point
 	int y;
 };
 
+using NeighbourPoints = std::array<Point, NEIGHBOURS_COUNT>;
+
 IOParams GetIOParams(int argc, char* argv[]);
 IOParams GetIOFromFiles(char* argv[]);
 Field GetField(std::istream& input);
 void FillField(Field& field);
-std::queue<Point> GetStartPoints(const Field& field);
-std::array<Point, 4> GetPointNeighbors(const Point& point);
+std::queue<Point> FillQueueByStartPoints(const Field& field);
+NeighbourPoints GetNeighbourPoints(const Point& point);
 bool IsPointEmpty(const Field& field, const Point& point);
 bool IsHelpFlag(int argc, char* argv[]);
 void AssertFileIsOpen(const std::istream& file);
@@ -83,7 +86,7 @@ Field GetField(std::istream& input)
 	Field field{};
 	Point point = {0, 0};
 	char ch;
-	while (input.get(ch) and point.y < fieldSize)
+	while (input.get(ch) and point.y < FIELD_SIZE)
 	{
 		if (ch == eoln)
 		{
@@ -91,7 +94,7 @@ Field GetField(std::istream& input)
 			point.y++;
 			continue;
 		}
-		if (point.x >= fieldSize)
+		if (point.x >= FIELD_SIZE)
 		{
 			continue;
 		}
@@ -107,33 +110,34 @@ Field GetField(std::istream& input)
 
 void FillField(Field& field)
 {
-	const char flooded = '.';
+	const char filled = '.';
 
-	std::queue<Point> queue = GetStartPoints(field);
+	std::queue<Point> queue = FillQueueByStartPoints(field);
 	while (!queue.empty())
 	{
 		auto currentPoint = queue.front();
-		std::array<Point, 4> neighborPoints = GetPointNeighbors(currentPoint);
+		NeighbourPoints neighborPoints = GetNeighbourPoints(currentPoint);
 
 		for (auto& point : neighborPoints)
 		{
-			if (IsPointEmpty(field, point))
+			if (!IsPointEmpty(field, point))
 			{
-				field[point.y][point.x] = flooded;
-				queue.push(point);
+				continue;
 			}
+			field[point.y][point.x] = filled;
+			queue.push(point);
 		}
 		queue.pop();
 	}
 }
 
-std::queue<Point> GetStartPoints(const Field& field)
+std::queue<Point> FillQueueByStartPoints(const Field& field)
 {
 	const char startChar = 'O';
 	std::queue<Point> queue;
-	for (int i = 0; i < fieldSize; i++)
+	for (int i = 0; i < FIELD_SIZE; i++)
 	{
-		for (int j = 0; j < fieldSize; j++)
+		for (int j = 0; j < FIELD_SIZE; j++)
 		{
 			if (field[i][j] != startChar)
 			{
@@ -145,7 +149,7 @@ std::queue<Point> GetStartPoints(const Field& field)
 	return queue;
 }
 
-std::array<Point, 4> GetPointNeighbors(const Point& point)
+NeighbourPoints GetNeighbourPoints(const Point& point)
 {
 	return {{
 		{point.x - 1, point.y},
@@ -157,8 +161,8 @@ std::array<Point, 4> GetPointNeighbors(const Point& point)
 
 bool IsPointEmpty(const Field& field, const Point& point)
 {
-	bool inLimits = point.x >= 0 and point.x < fieldSize and
-					point.y >= 0 and point.y < fieldSize;
+	bool inLimits = point.x >= 0 and point.x < FIELD_SIZE and
+					point.y >= 0 and point.y < FIELD_SIZE;
 	if (!inLimits)
 	{
 		return false;

@@ -100,17 +100,14 @@ std::string IntToString(int n, int radix)
 	return value;
 }
 
-// TODO: IntToChar
 char IntToChar(int number)
 {
 	const int decimal = 10;
-
 	return number < decimal
 		? ('0' + number)
 		: ('A' + (number - decimal));
 }
 
-// TODO: IntToChar(char ch, int redux)
 int CharToInt(char ch, int radix)
 {
 	const int decimal = 10;

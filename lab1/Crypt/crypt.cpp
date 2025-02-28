@@ -1,10 +1,10 @@
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <limits>
+#include "masks.h"
 #include <cmath>
+#include <fstream>
+#include <iostream>
+#include <limits>
 #include <memory>
-
+#include <string>
 
 enum class ActionType
 {
@@ -21,13 +21,13 @@ struct InputParams
 };
 
 InputParams ParseArgs(int argc, char* argv[]);
-ActionType GetActionType(std::string actionStr);
-unsigned char GetKey(std::string keyStr);
+ActionType GetActionType(const std::string& actionStr);
+unsigned char GetKey(const std::string& keyStr);
 void Crypt(std::istream& input, std::ostream& output, unsigned char key);
 void Decrypt(std::istream& input, std::ostream& output, unsigned char key);
-int StringToInt(const std::string& str, int radix);
-int CharToInt(char ch, int radix);
-bool IsOverflow(int value, int addition);
+char GetCryptedChar(char ch, unsigned char key);
+char GetDecryptedChar(char ch, unsigned char key);
+void AssertIsDecimal(const std::string& numberStr);
 void AssertArgumentNumber(int argc);
 void AssertFileIsOpen(const std::istream& file);
 
@@ -59,9 +59,9 @@ InputParams ParseArgs(int argc, char* argv[])
 	AssertArgumentNumber(argc);
 	ActionType action = GetActionType(argv[1]);
 
-	auto inputFile= std::make_shared<std::ifstream>(argv[2]);
+	auto inputFile= std::make_shared<std::ifstream>(argv[2], std::ios::binary);
 	AssertFileIsOpen(*inputFile);
-	auto outputFile= std::make_shared<std::ofstream>(argv[3]);
+	auto outputFile= std::make_shared<std::ofstream>(argv[3], std::ios::binary);
 
 	unsigned char key = GetKey(argv[4]);
 	return {
@@ -77,19 +77,7 @@ void Crypt(std::istream& input, std::ostream& output, unsigned char key)
 	char byte;
 	while (input.get(byte))
 	{
-		char outByte = 0;
-		char cryptedByte = byte ^ key;
-
-		outByte |= (cryptedByte & 0b10000000) >> 2;
-		outByte |= (cryptedByte & 0b01000000) >> 5;
-		outByte |= (cryptedByte & 0b00100000) >> 5;
-		outByte |= (cryptedByte & 0b00010000) << 3;
-		outByte |= (cryptedByte & 0b00001000) << 3;
-		outByte |= (cryptedByte & 0b00000100) << 2;
-		outByte |= (cryptedByte & 0b00000010) << 2;
-		outByte |= (cryptedByte & 0b00000001) << 2;
-
-		output << outByte;
+		output << GetCryptedChar(byte, key);
 	}
 }
 
@@ -98,22 +86,43 @@ void Decrypt(std::istream& input, std::ostream& output, unsigned char key)
 	char byte;
 	while (input.get(byte))
 	{
-		char cryptedByte = 0;
-		cryptedByte |= (byte & 0b10000000) >> 3;
-		cryptedByte |= (byte & 0b01000000) >> 3;
-		cryptedByte |= (byte & 0b00100000) << 2;
-		cryptedByte |= (byte & 0b00010000) >> 2;
-		cryptedByte |= (byte & 0b00001000) >> 2;
-		cryptedByte |= (byte & 0b00000100) >> 2;
-		cryptedByte |= (byte & 0b00000010) << 5;
-		cryptedByte |= (byte & 0b00000001) << 5;
-
-		char outByte = cryptedByte ^ key;
-		output << outByte;
+		output << GetDecryptedChar(byte, key);
 	}
 }
 
-ActionType GetActionType(std::string actionStr)
+char GetCryptedChar(char ch, unsigned char key)
+{
+	char outChar = 0;
+	char cryptedByte = ch ^ key;
+
+	outChar |= (cryptedByte & eighthByte) >> 2;
+	outChar |= (cryptedByte & seventhByte) >> 5;
+	outChar |= (cryptedByte & sixthByte) >> 5;
+	outChar |= (cryptedByte & fifthByte) << 3;
+	outChar |= (cryptedByte & fourthByte) << 3;
+	outChar |= (cryptedByte & thirdByte) << 2;
+	outChar |= (cryptedByte & secondByte) << 2;
+	outChar |= (cryptedByte & firstByte) << 2;
+
+	return outChar;
+}
+
+char GetDecryptedChar(char ch, unsigned char key)
+{
+	char decryptedChar = 0;
+	decryptedChar |= (ch & eighthByte) >> 3;
+	decryptedChar |= (ch & seventhByte) >> 3;
+	decryptedChar |= (ch & sixthByte) << 2;
+	decryptedChar |= (ch & fifthByte) >> 2;
+	decryptedChar |= (ch & fourthByte) >> 2;
+	decryptedChar |= (ch & thirdByte) >> 2;
+	decryptedChar |= (ch & secondByte) << 5;
+	decryptedChar |= (ch & firstByte) << 5;
+
+	return decryptedChar ^ key;
+}
+
+ActionType GetActionType(const std::string& actionStr)
 {
 	const std::string crypt = "crypt";
 	const std::string decrypt = "decrypt";
@@ -122,20 +131,17 @@ ActionType GetActionType(std::string actionStr)
 	{
 		return ActionType::Crypt;
 	}
-	else if (actionStr == decrypt)
+	if (actionStr == decrypt)
 	{
 		return ActionType::Decrypt;
 	}
-	else
-	{
-		throw std::invalid_argument("Wrong action argument");
-	}
+	throw std::invalid_argument("Wrong action argument");
 }
 
-unsigned char GetKey(std::string keyStr)
+unsigned char GetKey(const std::string& keyStr)
 {
-	const int decimalRadix = 10;
-	int keyNumber = StringToInt(keyStr, decimalRadix);
+	AssertIsDecimal(keyStr);
+	int keyNumber = std::stoi(keyStr);
 
 	if (keyNumber < std::numeric_limits<unsigned char>::min() or
 		keyNumber > std::numeric_limits<unsigned char>::max())
@@ -143,52 +149,6 @@ unsigned char GetKey(std::string keyStr)
 		throw std::invalid_argument("Wrong key argument");
 	}
 	return static_cast<unsigned char>(keyNumber);
-}
-
-int StringToInt(const std::string& str, int radix)
-{
-	int value = 0;
-	for (size_t i = 0; i < str.length(); i++)
-	{
-		char digit = str[str.length() - i - 1];
-		if (digit == '-')
-		{
-			value *= (-1);
-			continue;
-		}
-		int addition = CharToInt(digit, radix) * std::pow(radix, i);
-		if (IsOverflow(value, addition))
-		{
-			throw std::invalid_argument("Overflow");
-		}
-		value += addition;
-	}
-	return value;
-}
-
-int CharToInt(char ch, int radix)
-{
-	const int decimal = 10;
-	bool isDigit = ch >= '0' and ch <= '9';
-	bool isLetter = ch >= 'A' and ch <= 'Z';
-
-	if (!isDigit && !isLetter)
-	{
-		throw std::runtime_error("Invalid digit");
-	}
-	int number = (isDigit)
-		? ch - '0'
-		: ch - 'A' + decimal;
-	if (number >= radix)
-	{
-		throw std::runtime_error("Invalid number");
-	}
-	return number;
-}
-
-bool IsOverflow(int value, int addition)
-{
-	return value > std::numeric_limits<int>::max() - addition;
 }
 
 void AssertArgumentNumber(int argc)
@@ -205,5 +165,16 @@ void AssertFileIsOpen(const std::istream& file)
 	if (file.fail())
 	{
 		throw std::invalid_argument("Wrong input file");
+	}
+}
+
+void AssertIsDecimal(const std::string& numberStr)
+{
+	for (const auto& ch : numberStr)
+	{
+		if (!std::isdigit(ch))
+		{
+			throw std::invalid_argument("Wrong key argument");
+		}
 	}
 }

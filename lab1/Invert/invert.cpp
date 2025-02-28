@@ -8,11 +8,10 @@
 #include <cmath>
 
 
-const int matrixSize = 3;
+const int MATRIX_SIZE = 3;
 
-// TODO: по ссылочке
-using MatrixRow = std::array<double, matrixSize>;
-using Matrix3x3d = std::array<MatrixRow, matrixSize>;
+using MatrixRow = std::array<double, MATRIX_SIZE>;
+using Matrix3x3d = std::array<MatrixRow, MATRIX_SIZE>;
 using Matrix2x2d = std::array<std::array<double, 2>, 2>;
 
 std::shared_ptr<std::istream> GetInput(int argc, char* argv[]);
@@ -90,7 +89,6 @@ Matrix3x3d GetMatrix(const std::shared_ptr<std::istream>& input)
 
 Matrix3x3d GetInvertedMatrix(const Matrix3x3d& sourceMatrix)
 {
-	// TODO: пересобрать функцию, растащить по шагам
 	double determinant = GetMatrixDet(sourceMatrix);
 	AssertDeterminant(determinant);
 
@@ -243,7 +241,7 @@ void AssertArgCount(int argc)
 
 void AssertMatrixElementIndex(int index)
 {
-	if (index >= matrixSize)
+	if (index >= MATRIX_SIZE)
 	{
 		throw std::runtime_error("Invalid matrix format");
 	}
@@ -251,7 +249,7 @@ void AssertMatrixElementIndex(int index)
 
 void AssertFullMatrix(int index)
 {
-	if (index < matrixSize)
+	if (index < MATRIX_SIZE)
 	{
 		throw std::runtime_error("Invalid matrix format");
 	}
