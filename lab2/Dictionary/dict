@@ -1,0 +1,11 @@
+мяч : ball
+The Red Square : Красная Площадь
+ball : мяч
+computer : компьютер
+кошка : cat
+компьютер : computer
+кот : cat
+cat : кот
+Красная Площадь : The Red Square
+dfs : поиск в ширину
+поиск в ширину : dfs
