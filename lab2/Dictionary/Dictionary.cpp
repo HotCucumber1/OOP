@@ -1,27 +1,12 @@
+#include "DictionaryCore.hpp"
 #include "Dictionary.hpp"
 #include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <ranges>
 #include <sstream>
-#include <vector>
+#include <ranges>
 
-enum class State
-{
-	Searching,
-	End,
-	Adding,
-	Saving,
-};
-
-void AssertValuesNumber(const std::vector<std::string>& values)
-{
-	const int valuesNumber = 2;
-	if (values.size() < valuesNumber)
-	{
-		throw std::runtime_error("Wrong dictionary file type");
-	}
-}
 
 void AddToDict(Dictionary& dict, const std::string& key, const std::set<std::string>& values)
 {
@@ -168,7 +153,7 @@ bool NeedToSave(const std::string& status)
 bool IsValueFound(Dictionary& dict, const std::string& key)
 {
 	// TODO: std::range
-	return std::any_of(dict.begin(), dict.end(),[&key](const auto& item) {
+	return std::ranges::any_of(dict, [&key](const auto& item) {
 		return ToLower(item.first) == ToLower(key);
 	});
 }
@@ -255,5 +240,14 @@ void StartDictionary(Dictionary& dict, const std::string& dictFileName)
 		default:
 			break;
 		}
+	}
+}
+
+void AssertValuesNumber(const std::vector<std::string>& values)
+{
+	const int valuesNumber = 2;
+	if (values.size() < valuesNumber)
+	{
+		throw std::runtime_error("Wrong dictionary file type");
 	}
 }

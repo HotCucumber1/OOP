@@ -1,4 +1,5 @@
 #include "../../Core/Core.hpp"
+#include "DecoderCore.hpp"
 #include "Decoder.hpp"
 #include <unordered_map>
 
