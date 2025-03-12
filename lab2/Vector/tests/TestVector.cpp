@@ -2,8 +2,9 @@
 #include "../VectorCore.hpp"
 #include "catch2/catch_all.hpp"
 
-const char* programName = "./vector";
-TEST_CASE("Test reading") {
+
+TEST_CASE("Test reading")
+{
 	const std::string emptyInputFile = "../../../lab2/Vector/tests/data/empty";
 	const std::string lettersInputFile = "../../../lab2/Vector/tests/data/letters";
 	const std::string numbersInputFile = "../../../lab2/Vector/tests/data/numbers";
@@ -11,23 +12,27 @@ TEST_CASE("Test reading") {
 	const std::vector<double> numbers = {1.01, 2.01, 3.01, 4.01, 5.01};
 	const std::vector<double> empty;
 
-	SECTION("Test numbers input") {
+	SECTION("Test numbers input")
+	{
 		std::ifstream input(numbersInputFile);
 		REQUIRE(ReadNumbers(input) == numbers);
 	}
 
-	SECTION("Test empty input") {
+	SECTION("Test empty input")
+	{
 		std::ifstream input(emptyInputFile);
 		REQUIRE(ReadNumbers(input) == empty);
 	}
 
-	SECTION("Test input with letters") {
+	SECTION("Test input with letters")
+	{
 		std::ifstream input(lettersInputFile);
 		REQUIRE_THROWS_AS(ReadNumbers(input), std::runtime_error);
 	}
 }
 
-TEST_CASE("Test process") {
+TEST_CASE("Test process")
+{
 	const std::vector<double> positiveNumbers = {1.01, 2.01, 3.01, 4.01, 5.01};
 	const std::vector<double> negativeNumbers = {-1, 2.01, 3.01, 4.01, 5.01};
 	const std::vector<double> zeroNumberData = {1.01, 2.01, 3.01, 4.01, 0};
@@ -37,19 +42,23 @@ TEST_CASE("Test process") {
 	const std::vector<double> expectedNegativeNumbers = {1, -2.01, -3.01, -4.01, -5.01};
 	const std::vector<double> expectedNumbersWithZero = {0, 0, 0, 0, 0};
 
-	SECTION("Test positive numbers") {
+	SECTION("Test positive numbers")
+	{
 		REQUIRE(ProcessNumbers(positiveNumbers) == expectedPositiveNumbers);
 	}
 
-	SECTION("Test negative numbers") {
+	SECTION("Test negative numbers")
+	{
 		REQUIRE(ProcessNumbers(negativeNumbers) == expectedNegativeNumbers);
 	}
 
-	SECTION("Test numbers with zero") {
+	SECTION("Test numbers with zero")
+	{
 		REQUIRE(ProcessNumbers(zeroNumberData) == expectedNumbersWithZero);
 	}
 
-	SECTION("Test empty") {
+	SECTION("Test empty")
+	{
 		REQUIRE(ProcessNumbers(empty) == empty);
 	}
 }

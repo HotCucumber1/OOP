@@ -12,3 +12,4 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(Catch2)
 add_subdirectory(lab2/Dictionary)
 add_subdirectory(lab2/Vector)
+add_subdirectory(lab2/HTMLDecode)
