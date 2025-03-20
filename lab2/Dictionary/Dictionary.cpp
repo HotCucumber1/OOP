@@ -1,27 +1,26 @@
-#include "DictionaryCore.hpp"
-#include "Dictionary.hpp"
+#include "Dictionary.h"
+#include <vector>
 #include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <ranges>
 #include <sstream>
-#include <ranges>
 
 
-void AddToDict(Dictionary& dict, const std::string& key, const std::set<std::string>& values)
+void AssertValuesNumber(const std::vector<std::string>& values)
 {
-	if (dict.find(key) != dict.end())
+	const int valuesNumber = 2;
+	if (values.size() < valuesNumber)
 	{
-		dict[key].insert(values.begin(), values.end());
+		throw std::runtime_error("Wrong dictionary file type");
 	}
-	else
+}
+
+void AssertFileIsOpen(const std::istream& file)
+{
+	if (file.fail())
 	{
-		dict[key] = values;
-	}
-	for (const auto& value : values)
-	{
-		std::set<std::string> newValue = {key};
-		dict[value] = newValue;
+		throw std::invalid_argument("Failed to open file");
 	}
 }
 
@@ -49,34 +48,20 @@ std::vector<std::string> Split(const std::string& str, char delimiter)
 	return items;
 }
 
-std::pair<std::string, std::string> GetDictValues(const std::string& str, char delimiter)
+void AddToDict(Dictionary& dict, const std::string& key, const std::set<std::string>& values)
 {
-	std::vector<std::string> values = Split(str, delimiter);
-	AssertValuesNumber(values);
-	return std::make_pair(values[0], values[1]);
-}
-
-void PrintSet(const std::set<std::string>& set, std::ostream& output)
-{
-	bool first = true;
-	for (const auto& elem : set)
+	if (dict.find(key) != dict.end())
 	{
-		if (!first)
-		{
-			output << ", ";
-		}
-		output << elem;
-		first = false;
+		dict[key].insert(values.begin(), values.end());
 	}
-	output << std::endl;
-}
-
-void PrintDict(const Dictionary& dict, std::ostream& output)
-{
-	for (const auto& [key, value] : dict)
+	else
 	{
-		output << key << " : ";
-		PrintSet(value, output);
+		dict[key] = values;
+	}
+	for (const auto& value : values)
+	{
+		std::set<std::string> newValue = {key};
+		dict[value] = newValue;
 	}
 }
 
@@ -89,27 +74,21 @@ std::string ToLower(const std::string& str)
 	return lowerStr;
 }
 
-void AssertArgumentNumber(int argc)
+std::set<std::string> GetTranslation(Dictionary& dict, const std::string& key)
 {
-	const int argumentsNumber = 2;
-	if (argc != argumentsNumber)
+	if (dict.find(key) == dict.end())
 	{
-		throw std::invalid_argument("Wrong argument number");
+		return dict[ToLower(key)];
 	}
+	return dict[key];
 }
 
-void AssertFileIsOpen(const std::istream& file)
-{
-	if (file.fail())
-	{
-		throw std::invalid_argument("Failed to open file");
-	}
-}
 
-std::string GetFileName(int argc, char* argv[])
+std::pair<std::string, std::string> GetDictValues(const std::string& str, char delimiter)
 {
-	AssertArgumentNumber(argc);
-	return argv[1];
+	std::vector<std::string> values = Split(str, delimiter);
+	AssertValuesNumber(values);
+	return std::make_pair(values[0], values[1]);
 }
 
 Dictionary ReadDict(const std::string& dictFileName)
@@ -130,124 +109,9 @@ Dictionary ReadDict(const std::string& dictFileName)
 	return dict;
 }
 
-void SaveDictToFile(Dictionary& dict, const std::string& fileName)
+bool IsTranslationFound(Dictionary& dict, const std::string& key)
 {
-	std::ofstream output(fileName);
-	PrintDict(dict, output);
-	std::cout << "Изменения сохранены. До свидания." << std::endl;
-}
-
-void AddWordToDict(Dictionary& dict, const std::string& key, const std::string& word)
-{
-	std::set<std::string> addingValue = {word};
-	AddToDict(dict, key, addingValue);
-	std::cout << "Слово \"" << key  << "\" сохранено в словаре как \"" << word << "\"." << std::endl;
-}
-
-bool NeedToSave(const std::string& status)
-{
-	const std::string needToSave = "y";
-	return ToLower(status) == needToSave;
-}
-
-bool IsValueFound(Dictionary& dict, const std::string& key)
-{
-	// TODO: std::range
 	return std::ranges::any_of(dict, [&key](const auto& item) {
 		return ToLower(item.first) == ToLower(key);
 	});
-}
-
-std::set<std::string> GetValue(Dictionary& dict, const std::string& key)
-{
-	if (dict.find(key) == dict.end())
-	{
-		return dict[ToLower(key)];
-	}
-	return dict[key];
-}
-
-State HandleSearchingState(Dictionary& dict, std::string& searchedStr, std::string& newValue, bool& isChanged)
-{
-	const std::string endStr = "...";
-	std::getline(std::cin, searchedStr);
-
-	if (searchedStr == endStr)
-	{
-		if (!isChanged)
-		{
-			return State::End;
-		}
-		std::cout << "В словарь были внесены изменения. Введите Y или y для сохранения перед выходом." << std::endl;
-		return State::Saving;
-	}
-	if (IsValueFound(dict, searchedStr))
-	{
-		auto values = GetValue(dict, searchedStr);
-		PrintSet(values, std::cout);
-		return State::Searching;
-	}
-
-	std::cout << "Неизвестное слово \"" << searchedStr << "\". Введите перевод или пустую строку для отказа." << std::endl;
-	std::getline(std::cin, newValue);
-	if (newValue.empty())
-	{
-		std::cout << "Слово \"" << searchedStr << "\" проигнорировано." << std::endl;
-		return State::Searching;
-	}
-	return State::Adding;
-}
-
-State HandleAddingState(Dictionary& dict, const std::string& searchedStr, const std::string& newValue, bool& isChanged)
-{
-	AddWordToDict(dict, searchedStr, newValue);
-	isChanged = true;
-	return State::Searching;
-}
-
-State HandleSavingState(Dictionary& dict, const std::string& dictFileName)
-{
-	std::string input;
-	std::getline(std::cin, input);
-
-	if (NeedToSave(input))
-	{
-		SaveDictToFile(dict, dictFileName);
-	}
-	return State::End;
-}
-
-void StartDictionary(Dictionary& dict, const std::string& dictFileName)
-{
-	State state = State::Searching;
-	std::string searchedStr;
-	std::string newValue;
-	bool isChanged = false;
-
-	while (state != State::End)
-	{
-		switch (state)
-		{
-		case State::Searching:
-			state = HandleSearchingState(dict, searchedStr, newValue, isChanged);
-			break;
-		case State::Adding:
-			state = HandleAddingState(dict, searchedStr, newValue, isChanged);
-			break;
-		case State::Saving:
-			state = HandleSavingState(dict, dictFileName);
-			break;
-		default:
-			break;
-		}
-	}
-}
-
-void AssertValuesNumber(const std::vector<std::string>& values)
-{
-	const int valuesNumber = 2;
-	if (values.size() < valuesNumber)
-	{
-		throw std::runtime_error("Wrong dictionary file type");
-	}
 }

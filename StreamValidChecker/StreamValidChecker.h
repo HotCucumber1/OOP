@@ -1,5 +1,5 @@
 #pragma once
 #include <fstream>
 
-void AssertStreamIsOpen(std::istream& input);
+void AssertStreamIsValid(std::istream& input);
 void AssertStreamIsEnded(std::istream& input);

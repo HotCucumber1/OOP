@@ -1,12 +1,11 @@
-#include "../PrimeGenerator.hpp"
-#include "../PrimeGeneratorCore.hpp"
+#include "../PrimeGenerator.h"
 #include "catch2/catch_all.hpp"
 
 TEST_CASE("Test sieve")
 {
 	SECTION("Positive int")
 	{
-		const std::vector<bool> sieve = {false, false, true, true, false, true, false, true, false, false, false};
+		const std::vector<bool> sieve = { true, true, true, true, false, true };
 		REQUIRE(GetSieve(10) == sieve);
 	}
 
@@ -17,52 +16,8 @@ TEST_CASE("Test sieve")
 
 	SECTION("Zero")
 	{
-		const std::vector<bool> zeroSieve = {false};
+		const std::vector<bool> zeroSieve = {};
 		REQUIRE(GetSieve(0) == zeroSieve);
-	}
-}
-
-TEST_CASE("Test argument number")
-{
-	SECTION("Correct argument number")
-	{
-		REQUIRE_NOTHROW(AssertArgumentNumber(2));
-	}
-
-	SECTION("Wrong argument number")
-	{
-		REQUIRE_THROWS_AS(AssertArgumentNumber(3), std::invalid_argument);
-	}
-}
-
-TEST_CASE("Test argument positivity")
-{
-	SECTION("Positive argument")
-	{
-		REQUIRE_NOTHROW(AssertNumberIsPositive(10));
-	}
-
-	SECTION("Negative argument")
-	{
-		REQUIRE_THROWS_AS(AssertArgumentNumber(-10), std::invalid_argument);
-	}
-
-	SECTION("Zero argument")
-	{
-		REQUIRE_THROWS_AS(AssertArgumentNumber(0), std::invalid_argument);
-	}
-}
-
-TEST_CASE("Test argument is number")
-{
-	SECTION("Argument is a number")
-	{
-		REQUIRE(IsNumber("123") == true);
-	}
-
-	SECTION("Argument is not a number")
-	{
-		REQUIRE_NOTHROW(IsNumber("123x") == false);
 	}
 }
 
@@ -84,4 +39,14 @@ TEST_CASE("Test generate prime numbers set")
 		const std::set<int> zeroSieve = {};
 		REQUIRE(GeneratePrimeNumbersSet(0) == zeroSieve);
 	}
+
+	#ifdef NDEBUG
+	SECTION("Test upper bound")
+	{
+		const int upperBound = 100000000;
+		const int primesNumber = 5761455;
+
+		REQUIRE(GeneratePrimeNumbersSet(upperBound).size() == primesNumber);
+	}
+	#endif
 }

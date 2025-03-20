@@ -1,16 +1,7 @@
-#include "PrimeGenerator.hpp"
-#include "PrimeGeneratorCore.hpp"
-#include <algorithm>
+#include "PrimeGenerator.h"
 #include <stdexcept>
+#include <cmath>
 
-void AssertArgumentNumber(int argc)
-{
-	const int requiredArgumentNumber = 2;
-	if (argc != requiredArgumentNumber)
-	{
-		throw std::invalid_argument("Wrong argument number");
-	}
-}
 
 void AssertNumberIsPositive(int n)
 {
@@ -20,27 +11,6 @@ void AssertNumberIsPositive(int n)
 	}
 }
 
-bool IsNumber(const std::string& stringNumber)
-{
-	return !stringNumber.empty() &&
-		std::all_of(stringNumber.begin(), stringNumber.end(), ::isdigit);
-}
-
-void AssertArgumentIsNumber(const std::string& string)
-{
-	if (!IsNumber(string))
-	{
-		throw std::invalid_argument("Argument is not a number");
-	}
-}
-
-int GetUpperBoundFromCLI(int argc, char* argv[])
-{
-	AssertArgumentNumber(argc);
-	AssertArgumentIsNumber(argv[1]);
-	return std::stoi(argv[1]);
-}
-
 std::set<int> GeneratePrimeNumbersSet(int upperBound)
 {
 	AssertNumberIsPositive(upperBound);
@@ -48,9 +18,13 @@ std::set<int> GeneratePrimeNumbersSet(int upperBound)
 	std::set<int> primeNumbers = {};
 	std::vector<bool> sieve = GetSieve(upperBound);
 
-	for (int i = 0; i < sieve.size(); i++)
+	if (upperBound > 0)
 	{
-		if (!sieve[i])
+		primeNumbers.insert(2);
+	}
+	for (int i = 3; i < upperBound; i += 2)
+	{
+		if (!sieve[i / 2])
 		{
 			continue;
 		}
@@ -59,30 +33,25 @@ std::set<int> GeneratePrimeNumbersSet(int upperBound)
 	return primeNumbers;
 }
 
-void PrintSet(const std::set<int>& set, std::ostream& output)
-{
-	for (const auto& number : set)
-	{
-		output << number << ' ';
-	}
-	output << std::endl;
-}
-
 std::vector<bool> GetSieve(int n)
 {
 	AssertNumberIsPositive(n);
-	std::vector<bool> primeNumbers(n + 1, true);
-	primeNumbers[0] = primeNumbers[1] = false;
-
-	for (int i = 2; i <= n; i++)
+	if (n == 0)
 	{
-		if (!primeNumbers[i])
+		return {};
+	}
+	std::vector<bool> primeNumbers((n / 2) + 1, true);
+
+	int upperNumber = static_cast<int>(std::sqrt(n));
+	for (int i = 3; i <= upperNumber; i += 2)
+	{
+		if (!primeNumbers[i / 2])
 		{
 			continue;
 		}
-		for (int j = 2 * i; j <= n; j += i)
+		for (int j = i * i; j < n; j += 2 * i)
 		{
-			primeNumbers[j] = false;
+			primeNumbers[j / 2] = false;
 		}
 	}
 	return primeNumbers;

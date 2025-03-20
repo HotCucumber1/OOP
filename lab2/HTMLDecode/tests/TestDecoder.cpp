@@ -1,4 +1,4 @@
-#include "../DecoderCore.hpp"
+#include "../Decoder.h"
 #include "catch2/catch_all.hpp"
 
 TEST_CASE("Test decoder")

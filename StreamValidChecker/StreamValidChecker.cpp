@@ -1,7 +1,6 @@
-#include "Core.hpp"
+#include "StreamValidChecker.h"
 
-
-void AssertStreamIsOpen(std::istream& input)
+void AssertStreamIsValid(std::istream& input)
 {
 	if (input.fail())
 	{

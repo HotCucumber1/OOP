@@ -1,33 +1,27 @@
-#include "../Vector.hpp"
-#include "../VectorCore.hpp"
+#include "../Vector.h"
 #include "catch2/catch_all.hpp"
 
 
 TEST_CASE("Test reading")
 {
-	const std::string emptyInputFile = "../../../lab2/Vector/tests/data/empty";
-	const std::string lettersInputFile = "../../../lab2/Vector/tests/data/letters";
-	const std::string numbersInputFile = "../../../lab2/Vector/tests/data/numbers";
-
-	const std::vector<double> numbers = {1.01, 2.01, 3.01, 4.01, 5.01};
-	const std::vector<double> empty;
-
 	SECTION("Test numbers input")
 	{
-		std::ifstream input(numbersInputFile);
-		REQUIRE(ReadNumbers(input) == numbers);
+		std::istringstream numbersInput("1.01 2.01 3.01 4.01 5.01");
+		const std::vector<double> numbers = {1.01, 2.01, 3.01, 4.01, 5.01};
+		REQUIRE(ReadNumbers(numbersInput) == numbers);
 	}
 
 	SECTION("Test empty input")
 	{
-		std::ifstream input(emptyInputFile);
-		REQUIRE(ReadNumbers(input) == empty);
+		std::istringstream emptyInput("");
+		const std::vector<double> empty;
+		REQUIRE(ReadNumbers(emptyInput) == empty);
 	}
 
 	SECTION("Test input with letters")
 	{
-		std::ifstream input(lettersInputFile);
-		REQUIRE_THROWS_AS(ReadNumbers(input), std::runtime_error);
+		std::istringstream letterInput("12.45 asd 45");
+		REQUIRE_THROWS_AS(ReadNumbers(letterInput), std::runtime_error);
 	}
 }
 
@@ -63,21 +57,24 @@ TEST_CASE("Test process")
 	}
 }
 
-TEST_CASE("Test sorting") {
-
+TEST_CASE("Test sorting")
+{
 	const std::vector<double> unsortedVector = {1.05, 1.04, 1.03, 1.02, 1.01};
 	const std::vector<double> sortedVector = {1.01, 1.02, 1.03, 1.04, 1.05};
 	const std::vector<double> emptyVector;
 
-	SECTION("Unsorted vector") {
+	SECTION("Unsorted vector")
+	{
 		REQUIRE(GetSortedNumbers(unsortedVector) == sortedVector);
 	}
 
-	SECTION("Sorted vector") {
+	SECTION("Sorted vector")
+	{
 		REQUIRE(GetSortedNumbers(sortedVector) == sortedVector);
 	}
 
-	SECTION("Empty vector") {
+	SECTION("Empty vector")
+	{
 		REQUIRE(GetSortedNumbers(emptyVector) == emptyVector);
 	}
 }

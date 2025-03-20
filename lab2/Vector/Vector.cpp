@@ -1,14 +1,12 @@
-#include "../../Core/Core.hpp"
-#include "VectorCore.hpp"
-#include "Vector.hpp"
+#include "../../StreamValidChecker/StreamValidChecker.h"
+#include "Vector.h"
 #include <algorithm>
 #include <iomanip>
-
 
 std::vector<double> ReadNumbers(std::istream& input)
 {
 	std::vector<double> numbers;
-	AssertStreamIsOpen(input);
+	AssertStreamIsValid(input);
 
 	double number;
 	while (input >> number)
@@ -25,13 +23,12 @@ std::vector<double> ProcessNumbers(const std::vector<double>& numbers)
 	{
 		return numbers;
 	}
-	std::vector<double> processedNumbers;
+	std::vector<double> processedNumbers = numbers;
 	double min = *std::min_element(numbers.begin(), numbers.end());
 
-	for (auto& number : numbers)
-	{
-		processedNumbers.push_back(number * min);
-	}
+	std::transform(processedNumbers.begin(), processedNumbers.end(), processedNumbers.begin(),[&min](double number) {
+		return number * min;
+	});
 	return processedNumbers;
 }
 

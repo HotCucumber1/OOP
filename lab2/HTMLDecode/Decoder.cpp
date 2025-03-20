@@ -1,8 +1,6 @@
-#include "../../Core/Core.hpp"
-#include "DecoderCore.hpp"
-#include "Decoder.hpp"
+#include "Decoder.h"
+#include "../../StreamValidChecker/StreamValidChecker.h"
 #include <unordered_map>
-
 
 const std::unordered_map<std::string_view, char> HTML_ENTITIES = {
 	{"&quot;", '\"'},
@@ -14,7 +12,7 @@ const std::unordered_map<std::string_view, char> HTML_ENTITIES = {
 
 void CopyStreamWithHtmlDecode(std::istream& input, std::ostream& output)
 {
-	AssertStreamIsOpen(input);
+	AssertStreamIsValid(input);
 	std::string line;
 	while (std::getline(input, line))
 	{
