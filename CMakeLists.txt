@@ -15,3 +15,5 @@ add_subdirectory(lab2/Vector)
 add_subdirectory(lab2/HTMLDecode)
 add_subdirectory(lab2/PrimeGenerator)
 add_subdirectory(lab2/URLParser)
+
+add_subdirectory(lab3/Car)
