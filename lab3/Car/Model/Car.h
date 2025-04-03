@@ -5,10 +5,10 @@ class Car
 {
 public:
 	Car();
-	bool TurnOnEngine();
-	bool TurnOffEngine();
-	bool SetGear(int gear);
-	bool SetSpeed(int speed);
+	void TurnOnEngine();
+	void TurnOffEngine();
+	void SetGear(int gear);
+	void SetSpeed(int speed);
 
 	bool IsTurnedOn() const;
 	int GetDirection() const;
@@ -16,6 +16,8 @@ public:
 	int GetGear() const;
 
 private:
+	void AssertGearIsValid(int gear) const;
+	void AssertSpeedIsValid(int speed) const;
 	void AssertCarIsStanding() const;
 	void AssertGearIsInRange(int gear) const;
 	void AssertCanSetGear(int gear) const;
@@ -26,7 +28,6 @@ private:
 	void AssertGearInSpeedRange(int gear) const;
 	void AssertCanIncreaseGear(int gear) const;
 	static void AssertSpeedIsNotNegative(int speed);
-
 
 private:
 	int m_speed;

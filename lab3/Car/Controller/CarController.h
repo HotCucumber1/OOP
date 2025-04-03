@@ -8,17 +8,17 @@ class CarController
 {
 public:
 	CarController(Car& car, std::istream& input, std::ostream& output);
-	bool HandleCommand();
+	void HandleCommand();
 private:
-	bool Info(std::istream& args);
-	bool EngineOn(std::istream& args);
-	bool EngineOff(std::istream& args);
-	bool SetGear(std::istream& args);
-	bool SetSpeed(std::istream& args);
+	void Info(std::istream& args);
+	void EngineOn(std::istream& args);
+	void EngineOff(std::istream& args);
+	void SetGear(std::istream& args);
+	void SetSpeed(std::istream& args);
 	void AssertInputIsOpen();
 
 private:
-	using Handler = std::function<bool(std::istream& args)>;
+	using Handler = std::function<void(std::istream& args)>;
 	using CommandMap = std::unordered_map<std::string, Handler>;
 
 	Car& m_car;

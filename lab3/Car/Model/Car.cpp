@@ -30,26 +30,20 @@ int Car::GetGear() const
 	return m_gear;
 }
 
-bool Car::TurnOnEngine()
+void Car::TurnOnEngine()
 {
 	m_isTurnedOn = true;
-	return m_isTurnedOn;
 }
 
-bool Car::TurnOffEngine()
+void Car::TurnOffEngine()
 {
 	AssertCarIsStanding();
-
 	m_isTurnedOn = false;
-	m_direction = m_standing;
-	return true;
 }
 
-bool Car::SetGear(int gear)
+void Car::SetGear(int gear)
 {
-	AssertGearIsInRange(gear);
-	AssertCanSetGear(gear);
-	AssertGearInSpeedRange(gear);
+	AssertGearIsValid(gear);
 
 	if (gear == -1)
 	{
@@ -58,15 +52,11 @@ bool Car::SetGear(int gear)
 	AssertCanIncreaseGear(gear);
 
 	m_gear = gear;
-	return true;
 }
 
-bool Car::SetSpeed(int speed)
+void Car::SetSpeed(int speed)
 {
-	AssertSpeedIsNotNegative(speed);
-	AssertCanSetSpeed();
-	AssertNonAcceleration(speed);
-	AssertSpeedInGearRange(speed);
+	AssertSpeedIsValid(speed);
 
 	if (speed > 0)
 	{
@@ -84,7 +74,21 @@ bool Car::SetSpeed(int speed)
 		m_direction = m_standing;
 	}
 	m_speed = speed;
-	return true;
+}
+
+void Car::AssertGearIsValid(int gear) const
+{
+	AssertGearIsInRange(gear);
+	AssertCanSetGear(gear);
+	AssertGearInSpeedRange(gear);
+}
+
+void Car::AssertSpeedIsValid(int speed) const
+{
+	AssertSpeedIsNotNegative(speed);
+	AssertCanSetSpeed();
+	AssertNonAcceleration(speed);
+	AssertSpeedInGearRange(speed);
 }
 
 void Car::AssertCarIsStanding() const
