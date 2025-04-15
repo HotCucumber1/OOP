@@ -24,26 +24,18 @@ ShapeController::ShapeController(std::istream& input, std::ostream& output)
 
 void ShapeController::ReadShape()
 {
-	try
-	{
-		std::string commandLine;
-		getline(m_input, commandLine);
-		std::istringstream stream(commandLine);
+	std::string commandLine;
+	getline(m_input, commandLine);
+	std::istringstream stream(commandLine);
 
-		std::string shape;
-		stream >> shape;
-
-		auto shapeHandler = m_shapeHandlerMap.find(shape);
-		if (shapeHandler == m_shapeHandlerMap.end())
-		{
-			throw std::runtime_error("Unknown shape");
-		}
-		shapeHandler->second(stream);
-	}
-	catch (const std::exception& exception)
+	std::string shape;
+	stream >> shape;
+	auto shapeHandler = m_shapeHandlerMap.find(shape);
+	if (shapeHandler == m_shapeHandlerMap.end())
 	{
-		m_output << exception.what() << std::endl;
+		throw std::runtime_error("Unknown shape");
 	}
+	shapeHandler->second(stream);
 }
 
 IShape* ShapeController::GetMaxAreaShape() const

@@ -25,11 +25,25 @@ double Triangle::GetArea() const
 	auto secondEdge = GetLength(m_vertex1, m_vertex3);
 	auto thirdEdge = GetLength(m_vertex2, m_vertex3);
 
-	auto perimeter = firstEdge + secondEdge + thirdEdge;
+	auto halfPerimeter = 0.5 * (firstEdge + secondEdge + thirdEdge);
 
-	return std::sqrt(perimeter * (perimeter - firstEdge) * (perimeter - secondEdge) * (perimeter - thirdEdge));
+	return std::sqrt(halfPerimeter * (halfPerimeter - firstEdge) * (halfPerimeter - secondEdge) * (halfPerimeter - thirdEdge));
 }
 
+Point Triangle::GetVertex1() const
+{
+	return m_vertex1;
+}
+
+Point Triangle::GetVertex2() const
+{
+	return m_vertex2;
+}
+
+Point Triangle::GetVertex3() const
+{
+	return m_vertex3;
+}
 
 std::string Triangle::ToString() const
 {

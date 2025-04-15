@@ -13,17 +13,10 @@ void AssertEdgeIsValid(double edge)
 
 Rectangle::Rectangle(Point leftTop, Point rightBottom, uint32_t fillColor, uint32_t outlineColor)
 	: SolidShape(fillColor, outlineColor)
+	, m_leftTop(leftTop)
 	, m_width(std::abs(rightBottom.x - leftTop.x))
 	, m_height(std::abs(leftTop.y - rightBottom.y))
 {
-	if (leftTop.x < rightBottom.x)
-	{
-		m_leftTop = leftTop;
-	}
-	else
-	{
-		m_leftTop = rightBottom;
-	}
 }
 
 Rectangle::Rectangle(Point leftTop, double width, double height, uint32_t fillColor, uint32_t outlineColor)
