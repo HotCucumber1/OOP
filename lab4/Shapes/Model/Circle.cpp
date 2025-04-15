@@ -40,6 +40,7 @@ double Circle::GetRadius() const
 
 std::string Circle::ToString() const
 {
+	// TODO: вынести
 	return "Area: " + std::to_string(GetArea()) + '\n' +
 		   "Perimeter: " + std::to_string(GetPerimeter()) + '\n' +
 		   "Radius: " + std::to_string(m_radius) + '\n' +

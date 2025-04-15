@@ -12,9 +12,10 @@ public:
 		char operation
 	);
 	double GetValue() const override;
+
 private:
 	std::shared_ptr<Computable> m_value = nullptr;
 	std::shared_ptr<Computable> m_arg1 = nullptr;
 	std::shared_ptr<Computable> m_arg2 = nullptr;
-	char m_operation;
+	char m_operation = '.';
 };

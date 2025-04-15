@@ -47,6 +47,7 @@ Point Triangle::GetVertex3() const
 
 std::string Triangle::ToString() const
 {
+	// TODO: все вынести
 	return "Area: " + std::to_string(GetArea()) + '\n' +
 		   "Perimeter: " + std::to_string(GetPerimeter()) + '\n' +
 		   "Outline color: " + std::to_string(m_outlineColor) + '\n' +

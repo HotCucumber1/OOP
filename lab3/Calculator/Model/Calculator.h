@@ -15,6 +15,7 @@ public:
 	std::shared_ptr<Computable> GetIdentifier(const std::string& identifier) const;
 	std::map<std::string, double> GetVariables() const;
 	std::map<std::string, double> GetFunctions() const;
+
 private:
 	void AssertIdentifierUnique(const std::string& identifier) const;
 private:

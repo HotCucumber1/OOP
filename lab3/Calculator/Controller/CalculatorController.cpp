@@ -57,26 +57,19 @@ CalculatorController::CalculatorController(Calculator& calculator, std::istream&
 
 void CalculatorController::HandleCommand()
 {
-	try
-	{
-		std::string commandLine;
-		getline(m_input, commandLine);
-		std::istringstream stream(commandLine);
+	std::string commandLine;
+	getline(m_input, commandLine);
+	std::istringstream stream(commandLine);
 
-		std::string command;
-		stream >> command;
+	std::string command;
+	stream >> command;
 
-		auto commandIt = m_commandMap.find(command);
-		if (commandIt == m_commandMap.end())
-		{
-			throw UnknownCommandException();
-		}
-		commandIt->second(stream);
-	}
-	catch (const std::exception& exception)
+	auto commandIt = m_commandMap.find(command);
+	if (commandIt == m_commandMap.end())
 	{
-		m_output << exception.what() << std::endl;
+		throw UnknownCommandException();
 	}
+	commandIt->second(stream);
 }
 
 void CalculatorController::InitVariable(std::istream& input)
