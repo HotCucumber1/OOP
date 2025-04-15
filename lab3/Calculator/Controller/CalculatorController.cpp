@@ -139,8 +139,8 @@ void CalculatorController::SetFunction(std::istream& input)
 
 	// TODO: ???
 	func->SetExpression(
-		m_calculator.GetIdentifier(identifier1),
-		m_calculator.GetIdentifier(identifier2),
+		std::move(m_calculator.GetIdentifier(identifier1)),
+		std::move(m_calculator.GetIdentifier(identifier2)),
 		operation.at(0)
 	);
 	m_calculator.AddFunction(identifier, func);
