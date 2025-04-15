@@ -98,19 +98,26 @@ void CalculatorController::SetVariable(std::istream& input)
 
 	AssertIdentifierIsValid(identifier);
 
+	std::string variableValue;
+	input >> variableValue;
 	Variable variable;
 	try
 	{
-		double value;
-		input >> value;
-		variable.SetValue(value);
+		size_t pos;
+		double value = std::stod(variableValue, &pos);
+		if (pos == variableValue.length())
+		{
+			variable.SetValue(value);
+		}
+		else
+		{
+			throw std::invalid_argument("");
+		}
 	}
-	catch (const std::invalid_argument& exception)
+	catch (const std::invalid_argument&)
 	{
-		std::string valueIdent;
-		input >> valueIdent;
-		valueIdent = Trim(valueIdent);
-		variable.SetValue(m_calculator.GetIdentifierValue(valueIdent));
+		variableValue = Trim(variableValue);
+		variable.SetValue(m_calculator.GetIdentifierValue(variableValue));
 	}
 	m_calculator.SetVariable(identifier, variable);
 }
@@ -127,9 +134,12 @@ void CalculatorController::SetFunction(std::istream& input)
 	auto func = std::make_shared<Function>();
 	size_t operationPos = expression.find_first_of("+-*/");
 
-	if (operationPos == expression.size())
+	if (operationPos == std::string::npos)
 	{
-		func->SetValue(m_calculator.GetIdentifier(expression));
+		func->SetValue(
+			std::move(m_calculator.GetIdentifier(Trim(expression)))
+		);
+		m_calculator.AddFunction(identifier, func);
 		return;
 	}
 
@@ -137,7 +147,6 @@ void CalculatorController::SetFunction(std::istream& input)
 	std::string operation = expression.substr(operationPos, 1);
 	std::string identifier2 = Trim(expression.substr(operationPos + 1));
 
-	// TODO: ???
 	func->SetExpression(
 		std::move(m_calculator.GetIdentifier(identifier1)),
 		std::move(m_calculator.GetIdentifier(identifier2)),

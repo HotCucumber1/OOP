@@ -5,12 +5,16 @@
 void Calculator::AddVariable(const std::string& identifier, const Variable& variable)
 {
 	AssertIdentifierUnique(identifier);
-	m_variables[identifier] = variable;
+	m_variables[identifier] = std::make_shared<Variable>(variable);
 }
 
 void Calculator::SetVariable(const std::string& identifier, const Variable& variable)
 {
-	m_variables[identifier] = variable;
+	if (m_variables.find(identifier) == m_variables.end())
+	{
+		AddVariable(identifier, variable);
+	}
+	m_variables[identifier]->SetValue(variable);
 }
 
 void Calculator::AddFunction(const std::string& identifier, const std::shared_ptr<Function>& function)
@@ -24,7 +28,7 @@ double Calculator::GetIdentifierValue(const std::string& identifier) const
 	auto variableValue = m_variables.find(identifier);
 	if (variableValue != m_variables.end())
 	{
-		return variableValue->second.GetValue();
+		return variableValue->second->GetValue();
 	}
 
 	auto functionValue = m_functions.find(identifier);
@@ -40,7 +44,7 @@ std::shared_ptr<Computable> Calculator::GetIdentifier(const std::string& identif
 	auto variable = m_variables.find(identifier);
 	if (variable != m_variables.end())
 	{
-		return std::make_shared<Variable>(variable->second);
+		return variable->second;
 	}
 
 	auto function = m_functions.find(identifier);
@@ -56,7 +60,7 @@ std::map<std::string, double> Calculator::GetVariables() const
 	std::map<std::string, double> values;
 	for (const auto& [identifier, variable] : m_variables)
 	{
-		values[identifier] = variable.GetValue();
+		values[identifier] = variable->GetValue();
 	}
 	return values;
 }
