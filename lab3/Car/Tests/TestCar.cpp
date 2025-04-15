@@ -224,7 +224,7 @@ TEST_CASE("Test setting speed")
 		REQUIRE_THROWS_AS(car.SetSpeed(20), FailedToSetSpeedWhileEngineOffException);
 	}
 
-	SECTION("Accelerate speed on neutral failure")
+	SECTION("Accelerate speed on neutral from forward failure")
 	{
 		const int startSpeed = 20;
 
@@ -253,5 +253,282 @@ TEST_CASE("Test setting speed")
 		car.TurnOnEngine();
 		car.SetGear(1);
 		REQUIRE_THROWS_AS(car.SetSpeed(50), SpeedIsOutOfRangeException);
+	}
+
+	SECTION("Accelerate on neutral from backward failure")
+	{
+		const int startSpeed = 15;
+
+		Car car;
+		car.TurnOnEngine();
+		car.SetGear(-1);
+		car.SetSpeed(startSpeed);
+		car.SetGear(0);
+
+		REQUIRE_THROWS_AS(car.SetSpeed(startSpeed + 5), FailedToAccelerateException);
+	}
+
+	SECTION("Decrease speed while moving backward on neutral success")
+	{
+		const int speed = 10;
+
+		Car car;
+		car.TurnOnEngine();
+		car.SetGear(-1);
+		car.SetSpeed(20);
+		car.SetGear(0);
+		car.SetSpeed(speed);
+
+		REQUIRE(car.GetSpeed() == speed);
+	}
+	
+	SECTION("Backward gear excess speed lower limit failure")
+	{
+		Car car;
+		car.TurnOnEngine();
+		car.SetGear(-1);
+		REQUIRE_THROWS_AS(car.SetSpeed(100), SpeedIsOutOfRangeException);
+	}
+
+	SECTION("Backward gear speed limit success")
+	{
+		Car car;
+		car.TurnOnEngine();
+		car.SetGear(-1);
+		car.SetSpeed(20);
+		REQUIRE(car.GetSpeed() == 20);
+	}
+
+	SECTION("First gear excess speed upper limit failure")
+	{
+		Car car;
+		car.TurnOnEngine();
+		car.SetGear(1);
+		REQUIRE_THROWS_AS(car.SetSpeed(100), SpeedIsOutOfRangeException);
+	}
+
+	SECTION("First gear speed upper limit success")
+	{
+		Car car;
+		car.TurnOnEngine();
+		car.SetGear(1);
+		car.SetSpeed(30);
+		REQUIRE(car.GetSpeed() == 30);
+	}
+
+	SECTION("Second gear excess speed lower limit failure")
+	{
+		Car car;
+		car.TurnOnEngine();
+		car.SetGear(1);
+		car.SetSpeed(30);
+		car.SetGear(2);
+		REQUIRE_THROWS_AS(car.SetSpeed(10), SpeedIsOutOfRangeException);
+	}
+
+	SECTION("Second gear speed lower limit success")
+	{
+		Car car;
+		car.TurnOnEngine();
+		car.SetGear(1);
+		car.SetSpeed(30);
+		car.SetGear(2);
+		car.SetSpeed(20);
+		REQUIRE(car.GetSpeed() == 20);
+	}
+
+	SECTION("Second gear excess speed upper limit failure")
+	{
+		Car car;
+		car.TurnOnEngine();
+		car.SetGear(1);
+		car.SetSpeed(30);
+		car.SetGear(2);
+		REQUIRE_THROWS_AS(car.SetSpeed(100), SpeedIsOutOfRangeException);
+	}
+
+	SECTION("Second gear speed upper limit success")
+	{
+		Car car;
+		car.TurnOnEngine();
+		car.SetGear(1);
+		car.SetSpeed(30);
+		car.SetGear(2);
+		car.SetSpeed(50);
+		REQUIRE(car.GetSpeed() == 50);
+	}
+
+	SECTION("Third gear excess speed lower limit failure")
+	{
+		Car car;
+		car.TurnOnEngine();
+		car.SetGear(1);
+		car.SetSpeed(30);
+		car.SetGear(2);
+		car.SetSpeed(40);
+		car.SetGear(3);
+		REQUIRE_THROWS_AS(car.SetSpeed(20), SpeedIsOutOfRangeException);
+	}
+
+	SECTION("Third gear speed lower limit success")
+	{
+		Car car;
+		car.TurnOnEngine();
+		car.SetGear(1);
+		car.SetSpeed(30);
+		car.SetGear(2);
+		car.SetSpeed(50);
+		car.SetGear(3);
+		car.SetSpeed(30);
+		REQUIRE(car.GetSpeed() == 30);
+	}
+
+	SECTION("Third gear excess speed upper limit failure")
+	{
+		Car car;
+		car.TurnOnEngine();
+		car.SetGear(1);
+		car.SetSpeed(30);
+		car.SetGear(2);
+		car.SetSpeed(40);
+		car.SetGear(3);
+		REQUIRE_THROWS_AS(car.SetSpeed(100), SpeedIsOutOfRangeException);
+	}
+
+	SECTION("Third gear speed upper limit success")
+	{
+		Car car;
+		car.TurnOnEngine();
+		car.SetGear(1);
+		car.SetSpeed(30);
+		car.SetGear(2);
+		car.SetSpeed(50);
+		car.SetGear(3);
+		car.SetSpeed(60);
+		REQUIRE(car.GetSpeed() == 60);
+	}
+
+	SECTION("Fourth gear excess speed lower limit failure")
+	{
+		Car car;
+		car.TurnOnEngine();
+		car.SetGear(1);
+		car.SetSpeed(30);
+		car.SetGear(2);
+		car.SetSpeed(40);
+		car.SetGear(3);
+		car.SetSpeed(50);
+		car.SetGear(4);
+		REQUIRE_THROWS_AS(car.SetSpeed(30), SpeedIsOutOfRangeException);
+	}
+
+	SECTION("Fourth gear speed lower limit success")
+	{
+		Car car;
+		car.TurnOnEngine();
+		car.SetGear(1);
+		car.SetSpeed(30);
+		car.SetGear(2);
+		car.SetSpeed(40);
+		car.SetGear(3);
+		car.SetSpeed(50);
+		car.SetGear(4);
+		car.SetSpeed(40);
+		REQUIRE(car.GetSpeed() == 40);
+	}
+
+	SECTION("Fourth gear excess speed upper limit failure")
+	{
+		Car car;
+		car.TurnOnEngine();
+		car.SetGear(1);
+		car.SetSpeed(30);
+		car.SetGear(2);
+		car.SetSpeed(40);
+		car.SetGear(3);
+		car.SetSpeed(50);
+		car.SetGear(4);
+		REQUIRE_THROWS_AS(car.SetSpeed(100), SpeedIsOutOfRangeException);
+	}
+
+	SECTION("Fourth gear speed upper limit success")
+	{
+		Car car;
+		car.TurnOnEngine();
+		car.SetGear(1);
+		car.SetSpeed(30);
+		car.SetGear(2);
+		car.SetSpeed(50);
+		car.SetGear(3);
+		car.SetSpeed(60);
+		car.SetGear(4);
+		car.SetSpeed(90);
+		REQUIRE(car.GetSpeed() == 90);
+	}
+
+	SECTION("Fifth gear excess speed lower limit failure")
+	{
+		Car car;
+		car.TurnOnEngine();
+		car.SetGear(1);
+		car.SetSpeed(30);
+		car.SetGear(2);
+		car.SetSpeed(40);
+		car.SetGear(3);
+		car.SetSpeed(50);
+		car.SetGear(4);
+		car.SetSpeed(60);
+		car.SetGear(5);
+		REQUIRE_THROWS_AS(car.SetSpeed(40), SpeedIsOutOfRangeException);
+	}
+
+	SECTION("Fifth gear speed lower limit success")
+	{
+		Car car;
+		car.TurnOnEngine();
+		car.SetGear(1);
+		car.SetSpeed(30);
+		car.SetGear(2);
+		car.SetSpeed(40);
+		car.SetGear(3);
+		car.SetSpeed(50);
+		car.SetGear(4);
+		car.SetSpeed(60);
+		car.SetGear(5);
+		car.SetSpeed(50);
+		REQUIRE(car.GetSpeed() == 50);
+	}
+
+	SECTION("Fifth gear excess speed upper limit failure")
+	{
+		Car car;
+		car.TurnOnEngine();
+		car.SetGear(1);
+		car.SetSpeed(30);
+		car.SetGear(2);
+		car.SetSpeed(40);
+		car.SetGear(3);
+		car.SetSpeed(50);
+		car.SetGear(4);
+		car.SetSpeed(60);
+		car.SetGear(5);
+		REQUIRE_THROWS_AS(car.SetSpeed(200), SpeedIsOutOfRangeException);
+	}
+
+	SECTION("Fifth gear speed upper limit success")
+	{
+		Car car;
+		car.TurnOnEngine();
+		car.SetGear(1);
+		car.SetSpeed(30);
+		car.SetGear(2);
+		car.SetSpeed(50);
+		car.SetGear(3);
+		car.SetSpeed(60);
+		car.SetGear(4);
+		car.SetSpeed(90);
+		car.SetGear(5);
+		car.SetSpeed(150);
+		REQUIRE(car.GetSpeed() == 150);
 	}
 }
