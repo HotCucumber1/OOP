@@ -6,9 +6,14 @@ int main()
 	try
 	{
 		ShapeController shapeController(std::cin, std::cout);
-		while (!std::cin.eof() || !std::cin.fail())
+		bool inputEnd = false;
+		while (!inputEnd)
 		{
 			shapeController.ReadShape();
+			if (std::cin.eof())
+			{
+				inputEnd = true;
+			}
 		}
 
 		auto maxAreaShape = shapeController.GetMaxAreaShape();
@@ -18,6 +23,8 @@ int main()
 				  << maxAreaShape->ToString() << std::endl;
 		std::cout << "Фигура с минимальным периметром: " << std::endl
 			      << minPerimeterShape->ToString() << std::endl;
+
+		shapeController.DrawShapes();
 	}
 	catch (const std::exception& exception)
 	{

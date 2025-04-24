@@ -4,6 +4,7 @@
 #include <sstream>
 #include <vector>
 #include <memory>
+#include <SFML/Graphics.hpp>
 
 class ShapeController
 {
@@ -12,6 +13,7 @@ public:
 	void ReadShape();
 	IShape* GetMaxAreaShape() const;
 	IShape* GetMinPerimeterShape() const;
+	void DrawShapes();
 
 private:
 	void ReadLineSegment(std::istream& args);
@@ -26,6 +28,7 @@ private:
 	std::vector<std::unique_ptr<IShape>> m_shapes;
 	std::istream& m_input;
 	std::ostream& m_output;
+	sf::RenderWindow m_window;
 
 	const ShapeHandlerMap m_shapeHandlerMap;
 };

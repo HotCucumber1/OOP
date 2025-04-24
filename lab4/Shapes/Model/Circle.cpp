@@ -38,13 +38,15 @@ double Circle::GetRadius() const
 	return m_radius;
 }
 
+void Circle::Draw(ICanvas& canvas) const
+{
+	canvas.FillCircle(m_center, m_radius, SolidShape::GetFillColor());
+}
+
 std::string Circle::ToString() const
 {
 	// TODO: вынести
-	return "Area: " + std::to_string(GetArea()) + '\n' +
-		   "Perimeter: " + std::to_string(GetPerimeter()) + '\n' +
+	return SolidShape::ToString() +
 		   "Radius: " + std::to_string(m_radius) + '\n' +
-		   "Center: (" + std::to_string(m_center.x) + ", " + std::to_string(m_center.y) + ")\n" +
-		   "Outline color: " + std::to_string(m_outlineColor) + '\n' +
-		   "Fill color: " + std::to_string(m_fillColor) + '\n';
+		   "Center: (" + std::to_string(m_center.x) + ", " + std::to_string(m_center.y) + ")\n";
 }

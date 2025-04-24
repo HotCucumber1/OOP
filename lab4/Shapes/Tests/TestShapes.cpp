@@ -21,6 +21,7 @@ TEST_CASE("Test line segment")
 		REQUIRE(lineSegment.GetStartPoint().y == startPoint.y);
 		REQUIRE(lineSegment.GetEndPoint().x == endPoint.x);
 		REQUIRE(lineSegment.GetEndPoint().y == endPoint.y);
+		REQUIRE(lineSegment.GetOutlineColor() == color);
 	}
 
 	SECTION("Create line segment with zero length success")

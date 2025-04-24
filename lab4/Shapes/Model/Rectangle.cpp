@@ -60,14 +60,21 @@ Point Rectangle::GetRightBottom() const
 	return Point(m_leftTop.x + m_width, m_leftTop.y + m_height);
 }
 
+void Rectangle::Draw(ICanvas& canvas) const
+{
+	Point leftBottom(m_leftTop.x, m_leftTop.y + m_height);
+	Point rightTop(m_leftTop.x + m_width, m_leftTop.y);
+	Point rightBottom(m_leftTop.x + m_width, m_leftTop.y + m_height);
+	std::vector<Point> points = {m_leftTop, rightTop, rightBottom, leftBottom};
+
+	canvas.FillPolygon(points, SolidShape::GetFillColor());
+}
+
 std::string Rectangle::ToString() const
 {
-	return "Area: " + std::to_string(GetArea()) + '\n' +
-		   "Perimeter: " + std::to_string(GetPerimeter()) + '\n' +
+	return SolidShape::ToString() +
 		   "Width: " + std::to_string(m_width) + '\n' +
 		   "Height: " + std::to_string(m_height) + '\n' +
-		   "Outline color: " + std::to_string(m_outlineColor) + '\n' +
-		   "Fill color: " + std::to_string(m_fillColor) + '\n' +
 		   "Left top: (" + std::to_string(m_leftTop.x) + ", " + std::to_string(m_leftTop.y) + ")\n" +
 		   "Right bottom: (" + std::to_string(m_leftTop.x + m_width) + ", " + std::to_string(m_leftTop.y + m_height) + ")\n";
 }

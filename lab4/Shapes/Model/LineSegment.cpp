@@ -29,11 +29,14 @@ Point LineSegment::GetEndPoint() const
 	return m_endPoint;
 }
 
+void LineSegment::Draw(ICanvas& canvas) const
+{
+	canvas.DrawLine(m_startPoint, m_endPoint, Shape::GetOutlineColor());
+}
+
 std::string LineSegment::ToString() const
 {
-	return "Area: " + std::to_string(GetArea()) + '\n' +
-		   "Perimeter: " + std::to_string(GetPerimeter()) + '\n' +
-		   "Outline color: " + std::to_string(m_outlineColor) + '\n' +
+	return Shape::ToString() +
 		   "Start point: (" + std::to_string(m_startPoint.x) + ", " + std::to_string(m_startPoint.y) + ")\n" +
 		   "End point: (" + std::to_string(m_endPoint.x) + ", " + std::to_string(m_endPoint.y) + ")\n";
 }

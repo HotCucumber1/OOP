@@ -5,9 +5,12 @@
 #include "../Model/Triangle.h"
 #include <ranges>
 #include <algorithm>
+#include "../Canvas/Canvas.h"
 
 
 const int COLOR_RADIX = 16;
+const int CANVAS_WIDTH = 1000;
+const int CANVAS_HEIGHT = 1000;
 
 ShapeController::ShapeController(std::istream& input, std::ostream& output)
 	: m_input(input)
@@ -18,6 +21,10 @@ ShapeController::ShapeController(std::istream& input, std::ostream& output)
 		  {"rectangle", [this](std::istream& stream) { ReadRectangle(stream); } },
 		  {"circle", [this](std::istream& stream) { ReadCircle(stream); } },
 	  })
+	, m_window(
+		  sf::VideoMode(CANVAS_WIDTH, CANVAS_HEIGHT),
+		  "Picture"
+		  )
 {
 	AssertInputIsOpen();
 }
@@ -33,9 +40,34 @@ void ShapeController::ReadShape()
 	auto shapeHandler = m_shapeHandlerMap.find(shape);
 	if (shapeHandler == m_shapeHandlerMap.end())
 	{
+		m_output << shape;
 		throw std::runtime_error("Unknown shape");
 	}
 	shapeHandler->second(stream);
+}
+
+void ShapeController::DrawShapes()
+{
+	Canvas canvas(m_window);
+
+	while (m_window.isOpen())
+	{
+		sf::Event event{};
+		while (m_window.pollEvent(event))
+		{
+			if (event.type == sf::Event::Closed)
+			{
+				m_window.close();
+			}
+		}
+
+		m_window.clear();
+		for (const auto& shape : m_shapes)
+		{
+			shape->Draw(canvas);
+		}
+		m_window.display();
+	}
 }
 
 IShape* ShapeController::GetMaxAreaShape() const

@@ -10,6 +10,7 @@ public:
 	double GetArea() const override;
 	double GetPerimeter() const override;
 	std::string ToString() const override;
+	void Draw(ICanvas& canvas) const override;
 
 	Point GetLeftTop() const;
 	Point GetRightBottom() const;
@@ -17,7 +18,7 @@ public:
 	double GetHeight() const;
 
 private:
-	Point m_leftTop{};
+	Point m_leftTop;
 	double m_width;
 	double m_height;
 };

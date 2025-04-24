@@ -1,6 +1,8 @@
 #pragma once
-#include "SolidShape.h"
+#include "ISolidShape.h"
 #include "Point.h"
+#include "SolidShape.h"
+#include "../Canvas/ICanvas.h"
 
 class Triangle : public SolidShape
 {
@@ -9,6 +11,7 @@ public:
 	double GetArea() const override;
 	double GetPerimeter() const override;
 	std::string ToString() const override;
+	void Draw(ICanvas& canvas) const override;
 	Point GetVertex1() const;
 	Point GetVertex2() const;
 	Point GetVertex3() const;

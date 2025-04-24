@@ -11,3 +11,8 @@ uint32_t SolidShape::GetFillColor() const
 {
 	return m_fillColor;
 }
+
+std::string SolidShape::ToString() const
+{
+	return Shape::ToString() + "Fill color: " + std::to_string(SolidShape::GetFillColor()) + '\n';
+}

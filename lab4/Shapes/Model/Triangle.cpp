@@ -47,12 +47,14 @@ Point Triangle::GetVertex3() const
 
 std::string Triangle::ToString() const
 {
-	// TODO: все вынести
-	return "Area: " + std::to_string(GetArea()) + '\n' +
-		   "Perimeter: " + std::to_string(GetPerimeter()) + '\n' +
-		   "Outline color: " + std::to_string(m_outlineColor) + '\n' +
-		   "Fill color: " + std::to_string(m_fillColor) + '\n' +
+	return SolidShape::ToString() +
 		   "First vertex: (" + std::to_string(m_vertex1.x) + ", " + std::to_string(m_vertex1.y) + ")\n" +
 		   "Second vertex: (" + std::to_string(m_vertex2.x) + ", " + std::to_string(m_vertex2.y) + ")\n" +
 		   "Third vertex: (" + std::to_string(m_vertex3.x) + ", " + std::to_string(m_vertex3.y) + ")\n";
+}
+
+void Triangle::Draw(ICanvas& canvas) const
+{
+	std::vector<Point> points{m_vertex1, m_vertex2, m_vertex3};
+	canvas.FillPolygon(points, SolidShape::GetFillColor());
 }

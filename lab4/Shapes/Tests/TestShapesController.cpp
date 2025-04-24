@@ -13,7 +13,6 @@ TEST_CASE("Test ShapeController")
 			"triangle 10 10 20 20 20 10 111111 FFFFFF\n"
 			"circle 0 0 100 AAAAAA BBBBBB\n"
 		);
-		// TODO: неверные параметры
 		double lineLength = 1;
 		double rectangleArea = 400;
 		double circleArea = M_PI * 100 * 100;
