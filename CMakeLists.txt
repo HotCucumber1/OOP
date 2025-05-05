@@ -20,3 +20,5 @@ add_subdirectory(lab3/Car)
 add_subdirectory(lab3/Calculator)
 
 add_subdirectory(lab4/Shapes)
+
+add_subdirectory(lab5/Date)
