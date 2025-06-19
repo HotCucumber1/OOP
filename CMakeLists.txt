@@ -22,3 +22,10 @@ add_subdirectory(lab3/Calculator)
 add_subdirectory(lab4/Shapes)
 
 add_subdirectory(lab5/Date)
+add_subdirectory(lab5/MyString)
+
+add_subdirectory(lab6/HttpUrl)
+add_subdirectory(lab6/StringList)
+
+add_subdirectory(lab7/FIndMaxEx)
+add_subdirectory(lab7/MyArray)
