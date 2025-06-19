@@ -23,7 +23,6 @@ std::vector<Man> men = {
 const std::string MAX_HEIGHT_MAN = "Петров Петр";
 const std::string MAX_WEIGHT_MAN = "Дмитриев Дмитрий";
 
-// TODO тест на исклбчение
 
 TEST_CASE("Test")
 {

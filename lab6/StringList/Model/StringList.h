@@ -13,7 +13,6 @@ private:
 	};
 
 public:
-	// TODO один класс
 	template <typename ValueType, typename NodeType, bool IsConst = false>
 	class BaseIterator
 	{
@@ -107,7 +106,6 @@ public:
 
 	ReverseIterator rbegin();
 	ReverseIterator rend();
-	// TODO тест
 	ConstReverseIterator crbegin() const;
 	ConstReverseIterator crend() const;
 

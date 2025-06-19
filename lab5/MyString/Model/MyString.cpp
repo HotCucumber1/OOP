@@ -1,18 +1,18 @@
 #include "MyString.h"
+#include <cassert>
 #include <cstring>
 #include <memory>
-#include <utility>
 #include <sstream>
-
+#include <utility>
 
 char* Allocate(size_t size)
 {
 	return static_cast<char*>(operator new(size));
 }
 
-void Deallocate(char* buffer) noexcept
+void Deallocate(const char* buffer) noexcept
 {
-	operator delete(buffer);
+	delete[] buffer;
 }
 
 MyString::MyString() noexcept
@@ -37,7 +37,7 @@ MyString::MyString(const char* pString, size_t length)
 	}
 	catch (const std::exception& exception)
 	{
-		operator delete(m_chars); // TODO operator delete why
+		delete[] m_chars;
 		throw exception;
 	}
 }
@@ -45,8 +45,7 @@ MyString::MyString(const char* pString, size_t length)
 MyString::MyString(const char* pString)
 	: MyString(
 		  pString,
-		  (pString == nullptr) ? 0 : strlen(pString)
-		  )
+		  (pString == nullptr) ? 0 : strlen(pString))
 {
 }
 
@@ -100,6 +99,7 @@ const char* MyString::GetStringData() const
 
 MyString MyString::SubString(size_t start, size_t length) const
 {
+	assert(start <= m_size);
 	// min (len, m_size - m_start);
 	if (start > m_size)
 	{
@@ -107,9 +107,9 @@ MyString MyString::SubString(size_t start, size_t length) const
 	}
 	if (length > m_size - start)
 	{
-		return {m_chars + start, m_size - start};
+		return { m_chars + start, m_size - start };
 	}
-	return {m_chars + start, length};
+	return { m_chars + start, length };
 }
 
 void MyString::Clear()
@@ -209,6 +209,7 @@ MyString& MyString::operator+=(const MyString& other)
 
 const char& MyString::operator[](size_t index) const
 {
+	assert(index < m_size);
 	if (index >= this->m_size)
 	{
 		throw std::out_of_range("String index out of range");
@@ -218,6 +219,7 @@ const char& MyString::operator[](size_t index) const
 
 char& MyString::operator[](size_t index)
 {
+	assert(index < m_size);
 	if (index >= this->m_size)
 	{
 		throw std::out_of_range("String index out of range");
@@ -263,4 +265,64 @@ std::strong_ordering operator<=>(const MyString& lhs, const MyString& rhs)
 bool operator==(const MyString& lhs, const MyString& rhs)
 {
 	return std::strcmp(lhs.m_chars, rhs.m_chars) == 0;
+}
+
+char* MyString::begin()
+{
+	return m_chars;
+}
+
+char* MyString::end()
+{
+	return m_chars + m_size;
+}
+
+const char* MyString::begin() const
+{
+	return m_chars;
+}
+
+const char* MyString::end() const
+{
+	return m_chars + m_size;
+}
+
+const char* MyString::cbegin() const
+{
+	return m_chars;
+}
+
+const char* MyString::cend() const
+{
+	return m_chars + m_size;
+}
+
+std::reverse_iterator<char*> MyString::rbegin()
+{
+	return std::reverse_iterator<char*>(end());
+}
+
+std::reverse_iterator<char*> MyString::rend()
+{
+	return std::reverse_iterator<char*>(begin());
+}
+
+std::reverse_iterator<const char*> MyString::rbegin() const
+{
+	return std::reverse_iterator<const char*>(end());
+}
+
+std::reverse_iterator<const char*> MyString::rend() const
+{
+	return std::reverse_iterator<const char*>(begin());
+}
+
+std::reverse_iterator<const char*> MyString::crbegin() const
+{
+	return std::reverse_iterator<const char*>(cend());
+}
+
+std::reverse_iterator<const char*> MyString::crend() const
+{
+	return std::reverse_iterator<const char*>(cbegin());
 }

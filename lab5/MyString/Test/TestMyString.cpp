@@ -1,7 +1,6 @@
 #include "../Model/MyString.h"
 #include <catch2/catch_all.hpp>
 
-
 TEST_CASE("MyString construction")
 {
 	SECTION("Default constructor")
@@ -199,5 +198,117 @@ TEST_CASE("MyString capacity")
 		s += MyString("aa");
 
 		REQUIRE(s.GetCapacity() >= prevCapacity);
+	}
+}
+
+TEST_CASE("Iterators")
+{
+	SECTION("Forward")
+	{
+		MyString str("abc");
+
+		std::string result;
+		for (auto it = str.begin(); it != str.end(); ++it)
+		{
+			result += *it;
+		}
+		REQUIRE(result == "abc");
+	}
+
+	SECTION("Reverse iteration")
+	{
+		MyString str("abc");
+
+		std::string reversed;
+		for (auto it = str.rbegin(); it != str.rend(); ++it)
+		{
+			reversed += *it;
+		}
+
+		REQUIRE(reversed == "cba");
+	}
+
+	SECTION("Const reverse iteration")
+	{
+		const MyString str("xyz");
+
+		std::string reversed;
+		for (auto it = str.crbegin(); it != str.crend(); ++it)
+		{
+			reversed += *it;
+		}
+
+		REQUIRE(reversed == "zyx");
+	}
+
+	SECTION("Iterator arithmetic")
+	{
+		MyString str("abcdef");
+
+		auto it = str.begin();
+		REQUIRE(*(it + 1) == 'b');
+		REQUIRE(*(1 + it) == 'b');
+
+		auto end = str.end();
+
+		REQUIRE(it < end);
+		REQUIRE(end > it);
+	}
+
+	SECTION("Empty string")
+	{
+		MyString empty;
+
+		REQUIRE(empty.begin() == empty.end());
+		REQUIRE(empty.rbegin() == empty.rend());
+
+		std::string result;
+		for (auto ch : empty)
+		{
+			result += ch;
+		}
+		REQUIRE(result.empty());
+	}
+
+	SECTION("Range-based for")
+	{
+		MyString str("cat");
+
+		std::string result;
+		for (auto ch : str)
+		{
+			result += ch;
+		}
+		REQUIRE(result == "cat");
+	}
+
+	SECTION("Iterator index access")
+	{
+		MyString str("abcdef");
+
+		auto it = str.begin();
+		REQUIRE(it[0] == 'a');
+		REQUIRE(it[3] == 'd');
+
+		it[2] = 'Z';
+		REQUIRE(str[2] == 'Z');
+	}
+
+	SECTION("MyString: const iterator index access")
+	{
+		const MyString str("abcdef");
+
+		auto it = str.cbegin();
+		REQUIRE(it[0] == 'a');
+		REQUIRE(it[5] == 'f');
+	}
+
+	SECTION("MyString: iterator indexing edge cases")
+	{
+		MyString str("abc");
+
+		auto it = str.begin();
+		REQUIRE(it[0] == 'a');
+		REQUIRE(it[2] == 'c');
 	}
 }

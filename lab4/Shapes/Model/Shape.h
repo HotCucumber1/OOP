@@ -8,6 +8,6 @@ public:
 	uint32_t GetOutlineColor() const final;
 	std::string ToString() const;
 
-private: // TODO: remove protected
+private:
 	uint32_t m_outlineColor;
 };

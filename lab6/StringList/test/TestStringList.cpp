@@ -102,7 +102,6 @@ TEST_CASE("Assignment operator")
 		REQUIRE(list1.GetLength() == 0);
 	}
 
-	// TODO self assignement
 	SECTION("TestSelfAssignment")
 	{
 		StringList list;
@@ -276,7 +275,6 @@ TEST_CASE("Arithmetic iterators")
 	list.PushBack("B");
 	list.PushBack("C");
 
-	// TODO begin--- or end++
 	SECTION("Increment end() iterator")
 	{
 		auto it = list.end();

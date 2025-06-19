@@ -45,7 +45,6 @@ void Circle::Draw(ICanvas& canvas) const
 
 std::string Circle::ToString() const
 {
-	// TODO: вынести
 	return SolidShape::ToString() +
 		   "Radius: " + std::to_string(m_radius) + '\n' +
 		   "Center: (" + std::to_string(m_center.x) + ", " + std::to_string(m_center.y) + ")\n";

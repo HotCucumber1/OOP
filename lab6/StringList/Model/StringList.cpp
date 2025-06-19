@@ -98,7 +98,6 @@ void StringList::Clear()
 
 void StringList::Insert(StringList::Iterator pos, const std::string& value)
 {
-	// TODO test
 	if (pos.m_node == nullptr && pos != end())
 	{
 		throw std::invalid_argument("Invalid iterator position");

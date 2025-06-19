@@ -31,10 +31,28 @@ public:
 	const char& operator[](size_t index) const;
 	char& operator[](size_t index);
 	friend std::ostream& operator<<(std::ostream& output, const MyString& string);
-	friend std::istream& operator>>(std::istream& input,MyString& string);
+	friend std::istream& operator>>(std::istream& input, MyString& string);
+
+	char* begin();
+	char* end();
+
+	const char* begin() const;
+	const char* end() const;
+
+	const char* cbegin() const;
+	const char* cend() const;
+
+	std::reverse_iterator<char*> rbegin();
+	std::reverse_iterator<char*> rend();
+
+	std::reverse_iterator<const char*> rbegin() const;
+	std::reverse_iterator<const char*> rend() const;
+
+	std::reverse_iterator<const char*> crbegin() const;
+	std::reverse_iterator<const char*> crend() const;
 
 private:
-	inline static char s_emptyString[] = {'\0'};
+	inline static char s_emptyString[] = { '\0' };
 
 	size_t m_size = 0;
 	size_t m_capacity = 0;
