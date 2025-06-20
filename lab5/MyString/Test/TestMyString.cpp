@@ -294,7 +294,7 @@ TEST_CASE("Iterators")
 		REQUIRE(str[2] == 'Z');
 	}
 
-	SECTION("MyString: const iterator index access")
+	SECTION("Const iterator index access")
 	{
 		const MyString str("abcdef");
 
@@ -303,12 +303,33 @@ TEST_CASE("Iterators")
 		REQUIRE(it[5] == 'f');
 	}
 
-	SECTION("MyString: iterator indexing edge cases")
+	SECTION("Iterator indexing edge cases")
 	{
 		MyString str("abc");
 
 		auto it = str.begin();
 		REQUIRE(it[0] == 'a');
 		REQUIRE(it[2] == 'c');
+	}
+
+	SECTION("Iterator update")
+	{
+		MyString str1("abc");
+		MyString str2("def");
+
+		auto it = str1.end();
+		REQUIRE(*(--it) == 'c');
+
+		str1 += str2;
+		auto it2 = str1.end();
+		REQUIRE(*(--it2) == 'f');
+	}
+
+	// TODO stl algorithm
+	SECTION("STL iterator")
+	{
+		MyString str1("abcdef");
+
+		REQUIRE(std::find(str1.begin(), str1.end(), 'c'));
 	}
 }

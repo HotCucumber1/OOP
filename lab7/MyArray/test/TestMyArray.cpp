@@ -1,6 +1,5 @@
-#include <catch2/catch_all.hpp>
 #include "../MyArray.h"
-
+#include <catch2/catch_all.hpp>
 
 TEST_CASE("Constructors")
 {
@@ -104,6 +103,114 @@ TEST_CASE("MyArray functionality")
 		REQUIRE(arr.GetSize() == 0);
 		REQUIRE_THROWS_AS(arr[0], std::out_of_range);
 	}
+
+	// TODO пустой CLEAR
+	SECTION("Clear empty")
+	{
+		MyArray<int> arr;
+
+		arr.Clear();
+		REQUIRE(arr.GetSize() == 0);
+		REQUIRE_THROWS_AS(arr[0], std::out_of_range);
+	}
+}
+
+TEST_CASE("MyArray assignment operators")
+{
+	SECTION("Copy assignment")
+	{
+		MyArray<int> a;
+		a.PushBack(1);
+		a.PushBack(2);
+		a.PushBack(3);
+
+		MyArray<int> b;
+		b = a;
+
+		REQUIRE(b.GetSize() == 3);
+		REQUIRE(b[0] == 1);
+		REQUIRE(b[1] == 2);
+		REQUIRE(b[2] == 3);
+
+		a[0] = 10;
+		REQUIRE(b[0] == 1);
+	}
+
+	SECTION("Move assignment")
+	{
+		MyArray<int> a;
+		a.PushBack(5);
+		a.PushBack(6);
+
+		MyArray<int> b;
+		b = std::move(a);
+
+		REQUIRE(b.GetSize() == 2);
+		REQUIRE(b[0] == 5);
+		REQUIRE(b[1] == 6);
+
+		REQUIRE(a.GetSize() == 0);
+	}
+
+	SECTION("Self-assignment (copy)")
+	{
+		MyArray<int> a;
+		a.PushBack(1);
+		a.PushBack(2);
+
+		a = a;
+		REQUIRE(a.GetSize() == 2);
+		REQUIRE(a[0] == 1);
+		REQUIRE(a[1] == 2);
+	}
+
+	SECTION("Self-assignment (move)")
+	{
+		MyArray<int> a;
+		a.PushBack(3);
+		a.PushBack(4);
+
+		a = std::move(a);
+		REQUIRE(a.GetSize() == 2);
+		REQUIRE(a[0] == 3);
+		REQUIRE(a[1] == 4);
+	}
+
+	SECTION("Copy assignment to larger destination")
+	{
+		MyArray<int> a;
+		a.PushBack(1);
+		a.PushBack(2);
+
+		MyArray<int> b;
+		for (int i = 0; i < 10; ++i)
+		{
+			b.PushBack(i);
+		}
+		b = a;
+
+		REQUIRE(b.GetSize() == 2);
+		REQUIRE(b[0] == 1);
+		REQUIRE(b[1] == 2);
+	}
+
+	SECTION("Copy assignment to smaller destination")
+	{
+		MyArray<int> a;
+		for (int i = 0; i < 5; ++i)
+			a.PushBack(i);
+
+		MyArray<int> b;
+		b.PushBack(99);
+
+		b = a;
+
+		REQUIRE(b.GetSize() == 5);
+		for (int i = 0; i < 5; ++i)
+		{
+			REQUIRE(b[i] == i);
+		}
+	}
 }
 
 TEST_CASE("Iterators")
@@ -142,6 +249,17 @@ TEST_CASE("Iterators")
 		arrRes.Resize(3);
 		REQUIRE(*arrRes.rbegin() == 2);
 	}
+
+	SECTION("STL iterator")
+	{
+		MyArray<int> arrRes;
+		for (int i = 0; i < 5; i++)
+		{
+			arrRes.PushBack(i);
+		}
+
+		REQUIRE(std::find(arrRes.begin(), arrRes.end(), 3));
+	}
 }
 
 TEST_CASE("Templated assignment")
@@ -156,6 +274,29 @@ TEST_CASE("Templated assignment")
 	REQUIRE(doubleArr.GetSize() == 2);
 	REQUIRE(doubleArr[0] == 1.0);
 	REQUIRE(doubleArr[1] == 2.0);
+}
+
+TEST_CASE("Cast test")
+{
+	struct Man
+	{
+		std::string name;
+		operator int() const
+		{
+			return std::stoi(name);
+		}
+	};
+
+	Man man("Andrey");
+
+	MyArray<int> intArr;
+	intArr.PushBack(1);
+	intArr.PushBack(2);
+
+	MyArray<Man> manArr;
+	manArr.PushBack(man);
+
+	REQUIRE_THROWS(intArr = manArr);
 }
 
 TEST_CASE("MyArray with strings")

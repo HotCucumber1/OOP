@@ -12,11 +12,9 @@ public:
 		: m_size(other.m_size)
 		, m_capacity(other.m_capacity)
 	{
-		m_content = new T[other.m_size];
-		for (size_t i = 0; i < other.m_size; i++)
-		{
-			m_content[i] = other.m_content[i];
-		}
+		// TODO в одну функцию перемещение и выделение
+		m_content = AllocateAndCopy(other.m_content, other.m_size);
+		// TODO try catch
 	}
 
 	MyArray(MyArray&& other) noexcept
@@ -80,19 +78,26 @@ public:
 
 		T* newContent = new T[size];
 		size_t minSize = std::min(m_size, size);
-		for (size_t i = 0; i < minSize; i++)
+		try
 		{
-			newContent[i] = m_content[i];
+			// TODO stl библиотека котоая делает то же самое
+			for (size_t i = 0; i < minSize; i++)
+			{
+				newContent[i] = m_content[i];
+			}
+			for (size_t i = m_size; i < size; i++)
+			{
+				newContent[i] = T();
+			}
 		}
-		for (size_t i = m_size; i < size; i++)
+		catch (...)
 		{
-			newContent[i] = T();
+			delete[] newContent;
+			throw;
 		}
-
 		delete[] m_content;
-		m_content = newContent;
-		m_size = size;
-		m_capacity = size;
+
+		SetArrayData(newContent, size, size);
 	}
 
 	MyArray& operator=(const MyArray& other) noexcept
@@ -102,7 +107,9 @@ public:
 			return *this;
 		}
 		MyArray temp(other);
-		this = std::move(temp);
+		std::swap(m_content, temp.m_content);
+		std::swap(m_size, temp.m_size);
+		std::swap(m_capacity, temp.m_capacity);
 
 		return *this;
 	}
@@ -115,10 +122,9 @@ public:
 		}
 
 		delete[] m_content;
-		m_content = other.m_content;
-		m_size = other.m_size;
-		m_capacity = other.m_capacity;
-		other.Clear();
+		m_content = std::exchange(other.m_content, nullptr);
+		m_size = std::exchange(other.m_size, 0);
+		m_capacity = std::exchange(other.m_capacity, 0);
 
 		return *this;
 	}
@@ -126,10 +132,6 @@ public:
 	template <typename V>
 	MyArray& operator=(const MyArray<V>& other)
 	{
-		if (reinterpret_cast<const void*>(&other) == reinterpret_cast<const void*>(this))
-		{
-			return *this;
-		}
 		T* newContent = new T[other.GetSize()];
 		try
 		{
@@ -145,9 +147,7 @@ public:
 		}
 
 		delete[] m_content;
-		m_content = newContent;
-		m_size = other.GetSize();
-		m_capacity = other.GetSize() + 1;
+		SetArrayData(newContent, other.GetSize(), other.GetSize() + 1);
 
 		return *this;
 	}
@@ -193,4 +193,29 @@ private:
 	T* m_content = nullptr;
 	size_t m_size = 0;
 	size_t m_capacity = 0;
+
+	void SetArrayData(T* newContent, size_t newSize, size_t newCapacity)
+	{
+		m_content = newContent;
+		m_size = newSize;
+		m_capacity = newCapacity;
+	}
+
+	static T* AllocateAndCopy(const T* sourceArr, size_t count)
+	{
+		T* newData = new T[count];
+		try
+		{
+			for (size_t i = 0; i < count; ++i)
+			{
+				newData[i] = sourceArr[i];
+			}
+		}
+		catch (...)
+		{
+			delete[] newData;
+			throw;
+		}
+		return newData;
+	}
 };
